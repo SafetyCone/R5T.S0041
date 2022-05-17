@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\R5T.Magyar\source\R5T.Magyar\R5T.Magyar.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0088\source\R5T.D0088.X001\R5T.D0088.X001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0088.I0002\source\R5T.D0088.I0002\R5T.D0088.I0002.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0090\source\R5T.D0090.X001\R5T.D0090.X001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.L0014\source\R5T.L0014.X001\R5T.L0014.X001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.T0070\source\R5T.T0070.X001\R5T.T0070.X001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0094\source\R5T.D0094.I001\R5T.D0094.I001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0095\source\R5T.D0095.I001\R5T.D0095.I001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.A0003\source\R5T.A0003\R5T.A0003.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0081\source\R5T.D0081.I001\R5T.D0081.I001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Ostrogothia.Rivet\source\R5T.Ostrogothia.Rivet\R5T.Ostrogothia.Rivet.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0048\source\R5T.D0048.Default\R5T.D0048.Default.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0102\source\R5T.D0102.X001\R5T.D0102.X001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0104\source\R5T.D0104.X001\R5T.D0104.X001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.T0020\source\R5T.T0020\R5T.T0020.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+</Project>
