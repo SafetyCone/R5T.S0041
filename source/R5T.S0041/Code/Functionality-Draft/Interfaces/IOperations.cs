@@ -667,7 +667,7 @@ namespace R5T.S0041
                 .Append(projectFilePaths
                     .OrderAlphabetically());
 
-            FileHelper.WriteAllLinesSynchronous(
+            FileHelper.WriteAllLines_Synchronous(
                     projectsListTextFilePath,
                     lines);
         }
