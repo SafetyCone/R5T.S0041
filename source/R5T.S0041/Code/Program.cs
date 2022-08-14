@@ -92,7 +92,7 @@ namespace R5T.S0041
             var outputDirectoryPath = @"C:\Temp\Output\S0041\";
 
             var date = Instances.DateOperator.GetToday();
-            //var date = Instances.DateOperator.From_YYYYMMDD("20220601");
+            //var date = Instances.DateOperator.From_YYYYMMDD("20220724");
 
             /// Run.
             var summaryOutputDirectoryPath = Instances.PathOperator.GetDirectoryPath(
@@ -291,11 +291,11 @@ namespace R5T.S0041
             /// Inputs.
             var outputDirectoryPath = @"C:\Temp\Output\S0041\";
 
-            //var firstDate = Instances.DateOperator.GetYesterday();
+            var firstDate = Instances.DateOperator.GetYesterday();
             //var firstDate = Instances.DateOperator.GetDefault();
-            var firstDate = Instances.DateOperator.From_YYYYMMDD("20220601");
+            //var firstDate = Instances.DateOperator.From_YYYYMMDD("20220801");
             var secondDate = Instances.DateOperator.GetToday();
-            //var secondDate = Instances.DateOperator.From_YYYYMMDD("20220601");
+            //var secondDate = Instances.DateOperator.From_YYYYMMDD("20220727");
 
             /// Run.
             var functionalityFilePathsByFunctionalityVariety = new Dictionary<string, string>
@@ -434,7 +434,7 @@ namespace R5T.S0041
             var outputDirectoryPath = @"C:\Temp\Output\S0041\";
 
             var date = Instances.DateOperator.GetToday();
-            //var date = Instances.DateOperator.From_YYYYMMDD("20220601");
+            //var date = Instances.DateOperator.From_YYYYMMDD("20220727");
 
             /// Run.
             var filePaths = new[]
