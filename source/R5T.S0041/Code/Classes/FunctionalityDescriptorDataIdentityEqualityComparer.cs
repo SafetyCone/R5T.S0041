@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace R5T.S0041
 {
-    public class FunctionalityDescriptorDataIdentityEqualityComparer : IEqualityComparer<FunctionalityDescriptor>
+    public class FunctionalityDescriptorDataIdentityEqualityComparer : IEqualityComparer<InstanceDescriptor>
     {
         #region Static
 
@@ -14,20 +14,20 @@ namespace R5T.S0041
         #endregion
 
 
-        public bool Equals(FunctionalityDescriptor x, FunctionalityDescriptor y)
+        public bool Equals(InstanceDescriptor x, InstanceDescriptor y)
         {
             var output = true
-                && x.MethodIdentityName == y.MethodIdentityName
+                && x.IdentityName == y.IdentityName
                 && x.ProjectFilePath == y.ProjectFilePath
                 ;
 
             return output;
         }
 
-        public int GetHashCode(FunctionalityDescriptor obj)
+        public int GetHashCode(InstanceDescriptor obj)
         {
             var output = HashCode.Combine(
-                obj.MethodIdentityName,
+                obj.IdentityName,
                 obj.ProjectFilePath);
 
             return output;

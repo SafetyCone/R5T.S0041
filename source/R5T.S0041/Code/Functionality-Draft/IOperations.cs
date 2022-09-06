@@ -21,12 +21,12 @@ namespace R5T.S0041
     [DraftFunctionalityMarker]
     public partial interface IOperations : IDraftFunctionalityMarker
     {
-        public Func<Assembly, FunctionalityMethodNames[]> GetInstancePropertyNamesProviderFunction(
+        public Func<Assembly, InstanceIdentityNames[]> GetInstancePropertyNamesProviderFunction(
             string markerAttributeNamespacedTypeName)
         {
-            FunctionalityMethodNames[] Internal(Assembly assembly)
+            InstanceIdentityNames[] Internal(Assembly assembly)
             {
-                var functionalityMethodNamesSet = new List<FunctionalityMethodNames>();
+                var functionalityMethodNamesSet = new List<InstanceIdentityNames>();
 
                 Instances.Operations.ForPropertiesOnTypes(
                     assembly,
@@ -61,13 +61,13 @@ namespace R5T.S0041
             return output;
         }
 
-        public FunctionalityMethodNames GetValuePropertyNames(PropertyInfo propertyInfo)
+        public InstanceIdentityNames GetValuePropertyNames(PropertyInfo propertyInfo)
         {
             var methodIdentityName = Instances.IdentityNameProvider.GetIdentityName(propertyInfo);
 
             var methodParameterNamedIdentityName = methodIdentityName; // TODO Instances.ParameterNamedIdentityNameProvider.GetParameterNamedIdentityName(methodInfo);
 
-            var output = new FunctionalityMethodNames
+            var output = new InstanceIdentityNames
             {
                 IdentityName = methodIdentityName,
                 ParameterNamedIdentityName = methodParameterNamedIdentityName,
@@ -76,8 +76,52 @@ namespace R5T.S0041
             return output;
         }
 
+        public async Task OutputSummaryFile(
+            Dictionary<string, List<InstanceDescriptor>> functionalityDescriptorsByFunctionalityVariety,
+            List<Failure<string>> problemProjects,
+            string summaryFilePath)
+        {
+            var countsByFunctionalityVariety = functionalityDescriptorsByFunctionalityVariety
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Value.Count);
+
+            var problemProjectReasonCounts = problemProjects
+                .GroupBy(x => x.Message)
+                .Select(x => (Reason: x.Key, Count: x.Count()))
+                .Now();
+
+            var lines = countsByFunctionalityVariety
+                    .OrderAlphabetically(x => x.Key)
+                    .Select(pair => $"{pair.Key}: {pair.Value}")
+                    .Append($"\n\nProblem projects ({problemProjects.Count}). Reasons:")
+                    .Append(problemProjectReasonCounts
+                        // Order by descending count, then alphabetically by reason.
+                        .GroupBy(x => x.Count)
+                        .OrderByDescending(x => x.Key)
+                        .SelectMany(xGrouping => xGrouping
+                            .OrderAlphabetically(x => x.Reason)
+                            .Select(x => $"\n({x.Count}) {x.Reason}")));
+
+            await FileHelper.WriteAllLines(
+                summaryFilePath,
+                lines);
+        }
+
+        public Task OutputSummaryFile(
+            Dictionary<string, List<InstanceDescriptor>> functionalityDescriptorsByFunctionalityVariety,
+            List<Failure<string>> problemProjects)
+        {
+            var summaryFilePath = Instances.FilePaths.SummaryFilePath;
+
+            return this.OutputSummaryFile(
+                functionalityDescriptorsByFunctionalityVariety,
+                problemProjects,
+                summaryFilePath);
+        }
+
         public async Task OutputFunctionalityFiles(
-            ICollection<FunctionalityDescriptor> functionalityDescriptors,
+            ICollection<InstanceDescriptor> functionalityDescriptors,
             string title,
             string jsonOutputFilePath,
             string textOutputFilePath)
@@ -92,127 +136,6 @@ namespace R5T.S0041
                 title,
                 textOutputFilePath,
                 functionalityDescriptors);
-        }
-
-        public Task OutputExplorationsFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.ExplorationsOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.ExplorationsOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Explorations",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-        public Task OutputDraftExplorationsFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.DraftExplorationsOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.DraftExplorationsOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Explorations-Draft",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-
-        public Task OutputExperimentsFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.ExperimentsOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.ExperimentsOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Experiments",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-        public Task OutputDraftExperimentsFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.DraftExperimentsOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.DraftExperimentsOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Experiments-Draft",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-        public Task OutputDemonstrationsFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.DemonstrationsOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.DemonstrationsOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Demonstrations",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-        public Task OutputDraftDemonstrationsFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.DraftDemonstrationsOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.DraftDemonstrationsOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Demonstrations-Draft",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-        public Task OutputDraftValuesFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.DraftValuesOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.DraftValuesOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Values-Draft",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-        public Task OutputValuesFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.ValuesOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.ValuesOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Values",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-        public Task OutputFunctionalityFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.FunctionalityOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.FunctionalityOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Functionalities",
-                jsonOutputFilePath,
-                textOutputFilePath);
-        }
-
-        public Task OutputDraftFunctionalityFiles(ICollection<FunctionalityDescriptor> functionalityDescriptors)
-        {
-            var jsonOutputFilePath = Instances.FilePaths.DraftFunctionalityOutputFilePath_Json;
-            var textOutputFilePath = Instances.FilePaths.DraftFunctionalityOutputFilePath_Text;
-
-            return this.OutputFunctionalityFiles(
-                functionalityDescriptors,
-                "Functionalities-Draft",
-                jsonOutputFilePath,
-                textOutputFilePath);
         }
 
         public ProjectFilesTuple[] GetProjectFilesTuples(
@@ -248,6 +171,17 @@ namespace R5T.S0041
             return projectFilesTuples;
         }
 
+        /// <inheritdoc cref="QueryProjectFilesTuples_AndWriteToFile(string)"/>
+        public void QueryProjectFilesTuples_AndWriteToFile()
+        {
+            var projectFilesTuplesJsonFilePath = this.GetProjectFilesTuplesJsonFilePath();
+
+            this.QueryProjectFilesTuples_AndWriteToFile(projectFilesTuplesJsonFilePath);
+        }
+
+        /// <summary>
+        /// Very quick operation.
+        /// </summary>
         public ProjectFilesTuple[] QueryProjectFilesTuples_AndWriteToFile(
             string projectFilesTuplesJsonFilePath)
         {
@@ -268,7 +202,7 @@ namespace R5T.S0041
             string targetFilePath,
             string searchDirectoryPath)
         {
-            var fileNameStem = Instances.PathOperator.GetFileNameStemForFilePath(targetFilePath);
+            var fileNameStem = Instances.PathOperator.GetFileNameStem(targetFilePath);
 
             // Begins with the file name stem, followed by a dash, then eight (8) numeric digits.
             var regexPattern = $@"^{fileNameStem}-\d{{8}}";;
@@ -279,7 +213,7 @@ namespace R5T.S0041
             return output;
         }
 
-        public (List<FunctionalityDescriptor> functionalityDescriptors, List<Failure<string>> problemProjects) GetFunctionalityDescriptors(
+        public (List<InstanceDescriptor> functionalityDescriptors, List<Failure<string>> problemProjects) GetFunctionalityDescriptors(
             ICollection<ProjectFilesTuple> projectFilesTuples,
             ILogger logger)
         {
@@ -292,7 +226,7 @@ namespace R5T.S0041
             return output;
         }
 
-        public (List<FunctionalityDescriptor> functionalityDescriptors, List<Failure<string>> problemProjects) GetDraftFunctionalityDescriptors(
+        public (List<InstanceDescriptor> functionalityDescriptors, List<Failure<string>> problemProjects) GetDraftFunctionalityDescriptors(
             ICollection<ProjectFilesTuple> projectFilesTuples,
             ILogger logger)
         {
@@ -374,14 +308,14 @@ namespace R5T.S0041
                 out problemProjects);
         }
 
-        public (List<FunctionalityDescriptor> functionalityDescriptors, List<Failure<string>> problemProjects) GetFunctionalityDescriptors(
+        public (List<InstanceDescriptor> functionalityDescriptors, List<Failure<string>> problemProjects) GetFunctionalityDescriptors(
             ICollection<ProjectFilesTuple> projectFilesTuples,
             ILogger logger,
-            Func<ProjectFilesTuple, WasFound<FunctionalityMethodNames[]>> getFunctionalityMethodNames)
+            Func<ProjectFilesTuple, WasFound<InstanceIdentityNames[]>> getFunctionalityMethodNames)
         {
             var problemProjects = new List<Failure<string>>();
 
-            var functionalityDescriptors = new List<FunctionalityDescriptor>();
+            var functionalityDescriptors = new List<InstanceDescriptor>();
 
             var projectCount = projectFilesTuples.Count;
 
@@ -425,19 +359,6 @@ namespace R5T.S0041
             return (functionalityDescriptors, problemProjects);
         }
 
-        public string GetDatedOutputDirectoryPath(
-            string outputDirectoryPath,
-            DateTime date)
-        {
-            var datedDirectoryName = Instances.DirectoryNameOperator.GetDirectoryName_YYYYMMDD(date);
-
-            var datedOutputDirectoryPath = Instances.PathOperator.GetDirectoryPath(
-                outputDirectoryPath,
-                datedDirectoryName);
-
-            return datedOutputDirectoryPath;
-        }
-
         public string GetDateComparisonOutputFilePath(
             DateTime firstDate,
             DateTime secondDate,
@@ -447,10 +368,10 @@ namespace R5T.S0041
             var firstDateString = Instances.DateOperator.ToString_YYYYMMDD(firstDate);
             var secondDateString = Instances.DateOperator.ToString_YYYYMMDD(secondDate);
 
-            var fileName = Instances.PathOperator.GetFileNameForFilePath(filePath);
+            var fileName = Instances.PathOperator.GetFileName(filePath);
 
-            var fileNameStem = Instances.FileNameOperator.GetFileNameStemFromFileName(fileName);
-            var fileExtension = Instances.FileNameOperator.GetFileExtensionFromFileName(fileName);
+            var fileNameStem = Instances.FileNameOperator.GetFileNameStem(fileName);
+            var fileExtension = Instances.FileNameOperator.GetFileExtension(fileName);
 
             var datedFileNameStem = $"{fileNameStem}-{firstDateString} to {secondDateString}";
             var datedFileName = Instances.FileNameOperator.GetFileName(
@@ -471,10 +392,10 @@ namespace R5T.S0041
         {
             var dateString = Instances.DateOperator.ToString_YYYYMMDD(date);
 
-            var fileName = Instances.PathOperator.GetFileNameForFilePath(filePath);
+            var fileName = Instances.PathOperator.GetFileName(filePath);
 
-            var fileNameStem = Instances.FileNameOperator.GetFileNameStemFromFileName(fileName);
-            var fileExtension = Instances.FileNameOperator.GetFileExtensionFromFileName(fileName);
+            var fileNameStem = Instances.FileNameOperator.GetFileNameStem(fileName);
+            var fileExtension = Instances.FileNameOperator.GetFileExtension(fileName);
 
             var datedFileNameStem = $"{fileNameStem}-{dateString}";
             var datedFileName = Instances.FileNameOperator.GetFileName(
@@ -488,9 +409,9 @@ namespace R5T.S0041
             return datedFilePath;
         }
 
-        public FunctionalityDescriptor GetDescriptor(
+        public InstanceDescriptor GetDescriptor(
             string projectFilePath,
-            FunctionalityMethodNames functionalityMethodNames,
+            InstanceIdentityNames functionalityMethodNames,
             Dictionary<string, string> documentationByMemberIdentityName)
         {
             var identityName = functionalityMethodNames.IdentityName;
@@ -499,10 +420,10 @@ namespace R5T.S0041
                 identityName,
                 String.Empty);
 
-            var output = new FunctionalityDescriptor
+            var output = new InstanceDescriptor
             {
-                MethodIdentityName = identityName,
-                MethodParameterNamedIdentityName = functionalityMethodNames.ParameterNamedIdentityName,
+                IdentityName = identityName,
+                ParameterNamedIdentityName = functionalityMethodNames.ParameterNamedIdentityName,
                 ProjectFilePath = projectFilePath,
                 DescriptionXML = descriptionXml
             };
@@ -510,9 +431,9 @@ namespace R5T.S0041
             return output;
         }
 
-        public FunctionalityDescriptor GetDescriptor(
+        public InstanceDescriptor GetDescriptor(
             string projectFilePath,
-            FunctionalityMethodNames functionalityMethodNames,
+            InstanceIdentityNames functionalityMethodNames,
             Dictionary<string, WasFound<string>> documentationByMethodIdentityName)
         {
             var identityName = functionalityMethodNames.IdentityName;
@@ -522,10 +443,10 @@ namespace R5T.S0041
                 : String.Empty
                 ;
 
-            var output = new FunctionalityDescriptor
+            var output = new InstanceDescriptor
             {
-                MethodIdentityName = identityName,
-                MethodParameterNamedIdentityName = functionalityMethodNames.ParameterNamedIdentityName,
+                IdentityName = identityName,
+                ParameterNamedIdentityName = functionalityMethodNames.ParameterNamedIdentityName,
                 ProjectFilePath = projectFilePath,
                 DescriptionXML = descriptionXml
             };
@@ -533,9 +454,9 @@ namespace R5T.S0041
             return output;
         }
 
-        public IEnumerable<FunctionalityDescriptor> GetDescriptors(
+        public IEnumerable<InstanceDescriptor> GetDescriptors(
             string projectFilePath,
-            IEnumerable<FunctionalityMethodNames> functionalityMethodNamesSet,
+            IEnumerable<InstanceIdentityNames> functionalityMethodNamesSet,
             Dictionary<string, WasFound<string>> documentationByMethodIdentityName)
         {
             var output = functionalityMethodNamesSet
@@ -617,6 +538,22 @@ namespace R5T.S0041
             return output;
         }
 
+        /// <summary>
+        /// Returns empty if the file path does not exist.
+        /// </summary>
+        public InstanceDescriptor[] LoadFunctionalityDescriptors(
+            string instanceDescriptorJsonFilePath)
+        {
+            var fileExists = Instances.FileSystemOperator.FileExists(instanceDescriptorJsonFilePath);
+            if (!fileExists)
+            {
+                return Array.Empty<InstanceDescriptor>();
+            }
+
+            var output = JsonFileHelper.LoadFromFile<InstanceDescriptor[]>(instanceDescriptorJsonFilePath);
+            return output;
+        }
+
         public string[] LoadProjectsListFile()
         {
             var output = this.LoadProjectsListFile(
@@ -639,7 +576,7 @@ namespace R5T.S0041
         public string[] QueryProjectFiles_AndWriteToFile()
         {
             var output = this.QueryProjectFiles_InRepositoriesDirectories_AndWriteToListTextFile(
-                EnumerableHelper.From(Instances.Operations.GetRepositoriesDirectoryPath()),
+                Instances.Operations.GetRepositoriesDirectoryPaths(),
                 this.GetProjectsListTextFilePath());
 
             return output;
@@ -720,7 +657,7 @@ namespace R5T.S0041
         public Task WriteFunctionalityDescriptors(
             string title,
             string outputFilePath,
-            ICollection<FunctionalityDescriptor> functionalityDescriptors)
+            ICollection<InstanceDescriptor> functionalityDescriptors)
         {
             var lines = EnumerableHelper.From($"{title}, Count: {functionalityDescriptors.Count}\n\n")
                 .Append(functionalityDescriptors
@@ -728,8 +665,8 @@ namespace R5T.S0041
                     .OrderAlphabetically(x => x.Key)
                     .SelectMany(xGroup => EnumerableHelper.From($"{xGroup.Key}:")
                         .Append(xGroup
-                            .OrderAlphabetically(x => x.MethodIdentityName)
-                            .Select(x => $"\t{x.MethodIdentityName}")
+                            .OrderAlphabetically(x => x.IdentityName)
+                            .Select(x => $"\t{x.IdentityName}")
                             .Append(String.Empty))));
 
             return FileHelper.WriteAllLines(
@@ -772,7 +709,7 @@ namespace R5T.S0041
                     foreach (var memberNode in memberNodes)
                     {
                         var memberIdentityName = memberNode.Attribute("name").Value;
-                        var documentationForMember = membersNode.FirstNode.ToString();
+                        var documentationForMember = memberNode.FirstNode.ToString();
 
                         output.Add(memberIdentityName, documentationForMember);
                     }
@@ -829,6 +766,50 @@ namespace R5T.S0041
             return defaultOutput;
         }
 
+        public void ProcessProjectFilesTuple(
+            ProjectFilesTuple tuple,
+            Dictionary<string, Func<Assembly, InstanceIdentityNames[]>> getInstanceIdentityNamesByInstanceVariety,
+            Dictionary<string, List<InstanceDescriptor>> functionalityDescriptorsByFunctionalityVariety)
+        {
+            // Get project documentation file contents.
+            var documentationByMemberIdentityName = Instances.Operations.GetDocumentationByMemberIdentityName(
+                tuple.DocumentationFilePath);
+
+            var instanceIdentityNamesSetsByFunctionalityVariety = new Dictionary<string, InstanceIdentityNames[]>();
+
+            // Perform all assembly actions on the assembly.
+            Instances.ReflectionOperator.InAssemblyContext(
+                tuple.AssemblyFilePath,
+                EnumerableHelper.From(@"C:\Users\David\Dropbox\Organizations\Rivet\Shared\Binaries\Nuget Assemblies\"),
+                assembly =>
+                {
+                    getInstanceIdentityNamesByInstanceVariety.ForEach(
+                        pair =>
+                        {
+                            var instanceIdentityNamesSet = pair.Value(assembly);
+
+                            instanceIdentityNamesSetsByFunctionalityVariety.Add(pair.Key, instanceIdentityNamesSet);
+                        });
+                });
+
+            // Create all descriptors, and add to output.
+            instanceIdentityNamesSetsByFunctionalityVariety.ForEach(
+                pair =>
+                {
+                    var descriptors = pair.Value
+                        .Select(functionalityMethodNames => Instances.Operations.GetDescriptor(
+                            tuple.ProjectFilePath,
+                            functionalityMethodNames,
+                            documentationByMemberIdentityName))
+                        ;
+
+                    // Get descriptor set (added initially).
+                    var allDescriptors = functionalityDescriptorsByFunctionalityVariety[pair.Key];
+
+                    allDescriptors.AddRange(descriptors);
+                });
+        }
+
         /// <summary>
         /// Check that the project file and assembly files exist, then run the project files tuple action.
         /// </summary>
@@ -852,13 +833,23 @@ namespace R5T.S0041
             return output;
         }
 
+        public IEnumerable<TypeInfo> SelectTypes(
+            Assembly assembly,
+            Func<TypeInfo, bool> typeSelector)
+        {
+            var output = assembly.DefinedTypes
+                .Where(typeSelector)
+                ;
+
+            return output;
+        }
+
         public IEnumerable<(TypeInfo TypeInfo, MethodInfo MethodInfo)> SelectMethodsOnTypes(
             Assembly assembly,
             Func<TypeInfo, bool> typeSelector,
             Func<MethodInfo, bool> methodSelector)
         {
-            var output = assembly.DefinedTypes
-                .Where(typeSelector)
+            var output = this.SelectTypes(assembly, typeSelector)
                 .SelectMany(typeInfo => typeInfo.DeclaredMethods
                     .Where(methodSelector)
                     .Select(methodInfo => (typeInfo, methodInfo)));
@@ -878,6 +869,16 @@ namespace R5T.S0041
                     .Select(propertyInfo => (typeInfo, propertyInfo)));
 
             return output;
+        }
+
+        public void ForTypes(
+            Assembly assembly,
+            Func<TypeInfo, bool> typeSelector,
+            Action<TypeInfo> action)
+        {
+            var types = this.SelectTypes(assembly, typeSelector);
+
+            types.ForEach(typeInfo => action(typeInfo));
         }
 
         public void ForMethodsOnTypes(
@@ -908,20 +909,19 @@ namespace R5T.S0041
             propertiesOnTypes.ForEach(tuple => action(tuple.TypeInfo, tuple.PropertyInfo));
         }
 
-        public Func<Assembly, FunctionalityMethodNames[]> GetInstanceMethodNamesProviderFunction(
+        public Func<Assembly, InstanceIdentityNames[]> GetInstanceTypeNamesProviderFunction(
             string markerAttributeNamespacedTypeName)
         {
-            FunctionalityMethodNames[] Internal(Assembly assembly)
+            InstanceIdentityNames[] Internal(Assembly assembly)
             {
-                var functionalityMethodNamesSet = new List<FunctionalityMethodNames>();
+                var functionalityMethodNamesSet = new List<InstanceIdentityNames>();
 
-                Instances.Operations.ForMethodsOnTypes(
+                Instances.Operations.ForTypes(
                     assembly,
                     Instances.Operations.GetInstanceTypeByMarkerAttributeNamespacedTypeNamePredicate(markerAttributeNamespacedTypeName),
-                    Instances.Operations.IsInstanceMethod,
-                    (typeInfo, methodInfo) =>
+                    typeInfo =>
                     {
-                        var functionalityMethodNames = Instances.Operations.GetFunctionalityMethodNames(methodInfo);
+                        var functionalityMethodNames = Instances.Operations.GetTypeInstanceIdentityNames(typeInfo);
 
                         functionalityMethodNamesSet.Add(functionalityMethodNames);
                     });
@@ -932,13 +932,52 @@ namespace R5T.S0041
             return Internal;
         }
 
-        public FunctionalityMethodNames GetFunctionalityMethodNames(MethodInfo methodInfo)
+        public Func<Assembly, InstanceIdentityNames[]> GetInstanceMethodNamesProviderFunction(
+            string markerAttributeNamespacedTypeName)
+        {
+            InstanceIdentityNames[] Internal(Assembly assembly)
+            {
+                var typeInstanceIdentityNamesSet = new List<InstanceIdentityNames>();
+
+                Instances.Operations.ForMethodsOnTypes(
+                    assembly,
+                    Instances.Operations.GetInstanceTypeByMarkerAttributeNamespacedTypeNamePredicate(markerAttributeNamespacedTypeName),
+                    Instances.Operations.IsInstanceMethod,
+                    (typeInfo, methodInfo) =>
+                    {
+                        var functionalityMethodNames = Instances.Operations.GetMethodInstanceIdentityNames(methodInfo);
+
+                        typeInstanceIdentityNamesSet.Add(functionalityMethodNames);
+                    });
+
+                return typeInstanceIdentityNamesSet.ToArray();
+            }
+
+            return Internal;
+        }
+
+        public InstanceIdentityNames GetTypeInstanceIdentityNames(TypeInfo typeInfo)
+        {
+            var typeIdentityName = Instances.IdentityNameProvider.GetIdentityName(typeInfo);
+
+            var typeParameterNamedIdentityName = typeIdentityName; // Does not exist yet: Instances.ParameterNamedIdentityNameProvider.GetParameterNamedIdentityName(typeInfo);
+
+            var output = new InstanceIdentityNames
+            {
+                IdentityName = typeIdentityName,
+                ParameterNamedIdentityName = typeParameterNamedIdentityName,
+            };
+
+            return output;
+        }
+
+        public InstanceIdentityNames GetMethodInstanceIdentityNames(MethodInfo methodInfo)
         {
             var methodIdentityName = Instances.IdentityNameProvider.GetIdentityName(methodInfo);
 
             var methodParameterNamedIdentityName = Instances.ParameterNamedIdentityNameProvider.GetParameterNamedIdentityName(methodInfo);
 
-            var output = new FunctionalityMethodNames
+            var output = new InstanceIdentityNames
             {
                 IdentityName = methodIdentityName,
                 ParameterNamedIdentityName = methodParameterNamedIdentityName,
@@ -947,7 +986,7 @@ namespace R5T.S0041
             return output;
         }
 
-        public WasFound<FunctionalityMethodNames[]> AssemblyHasFunctionality(
+        public WasFound<InstanceIdentityNames[]> AssemblyHasFunctionality(
             string assemblyFilePath)
         {
             var output = Instances.ReflectionOperator.InAssemblyContext(
@@ -962,7 +1001,7 @@ namespace R5T.S0041
                         ;
 
                     var functionaityMethodNames = functionalityMethods
-                        .Select(this.GetFunctionalityMethodNames)
+                        .Select(this.GetMethodInstanceIdentityNames)
                         .ToArray();
 
                     var output = WasFound.FromArray(functionaityMethodNames);
@@ -972,7 +1011,7 @@ namespace R5T.S0041
             return output;
         }
 
-        public WasFound<FunctionalityMethodNames[]> AssemblyHasDraftFunctionality(
+        public WasFound<InstanceIdentityNames[]> AssemblyHasDraftFunctionality(
             string assemblyFilePath)
         {
             var output = Instances.ReflectionOperator.InAssemblyContext(
@@ -993,7 +1032,7 @@ namespace R5T.S0041
 
                             var methodParameterNamedIdentityName = Instances.ParameterNamedIdentityNameProvider.GetParameterNamedIdentityName(xMethodInfo);
 
-                            var output = new FunctionalityMethodNames
+                            var output = new InstanceIdentityNames
                             {
                                 IdentityName = methodIdentityName,
                                 ParameterNamedIdentityName = methodParameterNamedIdentityName,
@@ -1263,13 +1302,13 @@ namespace R5T.S0041
             string projectFilePath,
             Func<string, string> fileNameProviderFromProjectName)
         {
-            var projectDirectoryPath = Instances.PathOperator.GetDirectoryPathOfFilePath(projectFilePath);
+            var projectDirectoryPath = Instances.PathOperator.GetParentDirectoryPath_ForFile(projectFilePath);
 
             var binDebugNet5_0DirectoryPath = Instances.PathOperator.GetDirectoryPath(
                 projectDirectoryPath,
                 @"bin\Debug\net5.0\");
 
-            var projectName = Instances.PathOperator.GetFileNameStemForFilePath(projectFilePath);
+            var projectName = Instances.PathOperator.GetFileNameStem(projectFilePath);
 
             var fileName = fileNameProviderFromProjectName(projectName);
 

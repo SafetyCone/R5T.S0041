@@ -16,3 +16,20 @@ namespace R5T.S0041
         #endregion
     }
 }
+
+
+namespace R5T.S0041.Functionalities
+{
+    public class Operations : IOperations
+    {
+        #region Infrastructure
+
+        public static Operations Instance { get; } = new();
+
+        private Operations()
+        {
+        }
+
+        #endregion
+    }
+}

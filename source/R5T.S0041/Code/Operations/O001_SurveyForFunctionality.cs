@@ -59,7 +59,7 @@ namespace R5T.S0041
             string title,
             string jsonOutputFilePath,
             string textOutputFilePath,
-            Func<ICollection<ProjectFilesTuple>, ILogger, (List<FunctionalityDescriptor> functionalityDescriptors, List<Failure<string>> problemProjects)> getDescriptors)
+            Func<ICollection<ProjectFilesTuple>, ILogger, (List<InstanceDescriptor> functionalityDescriptors, List<Failure<string>> problemProjects)> getDescriptors)
         {
             /// Run.
             // Survey projects, or use the existing projects cache.
