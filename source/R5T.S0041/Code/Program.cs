@@ -1,11 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using R5T.D0088;
-using R5T.D0090;
-using R5T.D0105;
-using R5T.Magyar;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +5,17 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
+
+using R5T.D0088;
+using R5T.D0090;
+using R5T.D0105;
+using R5T.F0000;
 
 
 namespace R5T.S0041
@@ -82,27 +85,124 @@ namespace R5T.S0041
             //return this.GetDraftFunctionalityDescriptors();
             //return this.GetFunctionalityDescriptors();
 
-            /// Run these in order:
             // To add marker attributes, see project plan file.
+            return this.Run();
+
+            ///// Run these in order:
             //return this.GetAllDescriptors();
+            //return this.CopyOutputFilesToCloudDirectory();
             //return this.CreateDatedFiles();
             //return this.CompareFilesForTwoDates();
             //return this.CreateSummaryFile();
-            return this.CreateSummaryPresentationFile();
+            //return this.CreateSummaryPresentationFile();
+
+            /// Useful.
+            //return this.OpenOutputDirectory();
+            //return this.OpenCloudOutputDirectory();
+            //return this.OpenAllCloudOutputFiles();
+            //return this.OpenNugetAssembliesDirectory();
         }
 
-        private async Task CreateSummaryPresentationFile()
+        private async Task Run()
         {
             /// Inputs.
-            var processDirectoryPath = @"C:\Temp\Output\S0041\";
-            var outputFilePath = @"C:\Temp\Instances Summary.txt";
+            var date = Instances.DateOperator.GetToday();
+            //var date = Instances.DateOperator.GetDefault();
+            //var date = Instances.DateOperator.From_YYYYMMDD("20220819");
 
             //var olderDate = Instances.DateOperator.GetYesterday();
+            var olderDate = Instances.DateOperator.From_YYYYMMDD("20220929");
+
+
+            /// Run.
+            await this.GetAllDescriptors();
+            await this.CopyOutputFilesToCloudDirectory();
+            await this.CreateDatedFiles(date);
+            await this.CompareFilesForTwoDates(olderDate, date);
+            await this.CreateSummaryFile(olderDate, date);
+            await this.CreateSummaryPresentationFile(olderDate, date);
+        }
+
+        private async Task CopyOutputFilesToCloudDirectory()
+        {
+            /// Inputs.
+            var openFiles = true;
+
+            /// Run.
+            var allInstanceVarietyTextOutputFilePaths = Instances.FilePathOperator.GetAllTextOutputFilePaths();
+
+            var cloudOutputDestinationDirectoryFileCopyPairs = Instances.PathOperator.GetDestinationFileCopyPairs(
+                allInstanceVarietyTextOutputFilePaths,
+                Instances.DirectoryPaths.CloudOutputDirectoryPath);
+
+            Instances.FileSystemOperator.CopyFiles(cloudOutputDestinationDirectoryFileCopyPairs);
+
+            // Open files if desired.
+            if (openFiles)
+            {
+                // Use presentation-ordered instance varietys.
+                var cloudOutputTextFilePaths = Instances.FilePathOperator.GetAllCloudTextOutputFilePaths_InPresentationOrder();
+
+                await cloudOutputTextFilePaths
+                    .ForEach(async textFilePath => await this.NotepadPlusPlusOperator.OpenFilePath(textFilePath));
+            }
+        }
+
+        private Task OpenCloudOutputDirectory()
+        {
+            F0034.WindowsExplorerOperator.Instance.OpenDirectoryInExplorer(
+                Instances.DirectoryPaths.CloudOutputDirectoryPath);
+
+            return Task.CompletedTask;
+        }
+
+        private Task OpenOutputDirectory()
+        {
+            F0034.WindowsExplorerOperator.Instance.OpenDirectoryInExplorer(
+                Instances.DirectoryPaths.OutputDirectoryPath);
+
+            return Task.CompletedTask;
+        }
+
+        private async Task OpenAllCloudOutputFiles()
+        {
+            var cloudOutputTextFilePaths = Instances.FilePathOperator.GetAllCloudTextOutputFilePaths_InPresentationOrder();
+
+            await cloudOutputTextFilePaths
+                .ForEach(async textOutputFilePath => await this.NotepadPlusPlusOperator.OpenFilePath(textOutputFilePath));
+        }
+
+        private Task OpenNugetAssembliesDirectory()
+        {
+            var nugetAssembliesDirectoryPath = DirectoryPaths.Instance.NuGetAssemblies;
+
+            F0034.WindowsExplorerOperator.Instance.OpenDirectoryInExplorer(nugetAssembliesDirectoryPath);
+
+            return Task.CompletedTask;
+        }
+
+        private Task CreateSummaryPresentationFile()
+        {
+            /// Inputs.
             //var olderDate = Instances.DateOperator.GetYesterday();
-            var olderDate = Instances.DateOperator.From_YYYYMMDD("20220820");
+            //var olderDate = Instances.DateOperator.GetYesterday();
+            var olderDate = Instances.DateOperator.From_YYYYMMDD("20220920");
             var newerDate = Instances.DateOperator.GetToday();
             //var newerDate = Instances.DateOperator.GetDefault();
             //var newerDate = Instances.DateOperator.From_YYYYMMDD("20220819");
+
+            return this.CreateSummaryPresentationFile(
+                olderDate,
+                newerDate);
+        }
+
+        private async Task CreateSummaryPresentationFile(
+            DateTime olderDate,
+            DateTime newerDate)
+        {
+            /// Inputs.
+            var processDirectoryPath = Instances.DirectoryPaths.OutputDirectoryPath;
+            var outputFilePath = Instances.FilePaths.SummaryPresentationFilePath;
 
 
             /// Run.
@@ -127,31 +227,11 @@ namespace R5T.S0041
                 {
                     "Instances Summary",
                     $"\n{newerDateString}: as-of date",
-                    $"{olderDateString}: prior comparision date",
+                    $"{olderDateString}: prior comparison date",
                     "",
                 }
                 .Append(
-                    new[]
-                    {
-                        Instances.InstanceVariety.Functionality,
-                        Instances.InstanceVariety.Values,
-                        Instances.InstanceVariety.DataType,
-                        Instances.InstanceVariety.UtilityType,
-                        Instances.InstanceVariety.DraftFunctionality,
-                        Instances.InstanceVariety.DraftValues,
-                        Instances.InstanceVariety.DraftDataType,
-                        Instances.InstanceVariety.DraftUtilityType,
-                        Instances.InstanceVariety.MarkerAttribute,
-                        Instances.InstanceVariety.DraftMarkerAttribute,
-                        Instances.InstanceVariety.Explorations,
-                        Instances.InstanceVariety.DraftExplorations,
-                        Instances.InstanceVariety.Experiments,
-                        Instances.InstanceVariety.DraftExperiments,
-                        Instances.InstanceVariety.Demonstrations,
-                        Instances.InstanceVariety.DraftDemonstrations,
-                        Instances.InstanceVariety.Constants,
-                        Instances.InstanceVariety.DraftConstants,
-                    }
+                    Instances.InstanceVarietyOperator.GetAllInstanceVarietyNames_InPresentationOrder()
                     .SelectMany(x =>
                     {
                         var counts = datedInstancesSummary.InstanceVarietyCountsByVarietyName[x];
@@ -171,17 +251,27 @@ namespace R5T.S0041
             await this.NotepadPlusPlusOperator.OpenFilePath(outputFilePath);
         }
 
-        private async Task CreateSummaryFile()
+        private Task CreateSummaryFile()
         {
             /// Inputs.
-            var outputDirectoryPath = @"C:\Temp\Output\S0041\";
-
             //var olderDate = Instances.DateOperator.GetYesterday();
             //var olderDate = Instances.DateOperator.GetYesterday();
-            var olderDate = Instances.DateOperator.From_YYYYMMDD("20220820");
+            var olderDate = Instances.DateOperator.From_YYYYMMDD("20220920");
             var newerDate = Instances.DateOperator.GetToday();
             //var newerDate = Instances.DateOperator.GetDefault();
             //var newerDate = Instances.DateOperator.From_YYYYMMDD("20220819");
+
+            return this.CreateSummaryFile(
+                olderDate,
+                newerDate);
+        }
+
+        private async Task CreateSummaryFile(
+            DateTime olderDate,
+            DateTime newerDate)
+        {
+            /// Inputs.
+            var outputDirectoryPath = Instances.DirectoryPaths.OutputDirectoryPath;
 
 
             /// Run.
@@ -298,15 +388,24 @@ namespace R5T.S0041
 
         private Task CompareFilesForTwoDates()
         {
-            /// Inputs.
-            var outputDirectoryPath = @"C:\Temp\Output\S0041\";
-
             //var olderDate = Instances.DateOperator.GetYesterday();
             //var olderDate = Instances.DateOperator.GetYesterday();
-            var olderDate = Instances.DateOperator.From_YYYYMMDD("20220820");
+            var olderDate = Instances.DateOperator.From_YYYYMMDD("20220920");
             var newerDate = Instances.DateOperator.GetToday();
             //var newerDate = Instances.DateOperator.GetDefault();
             //var newerDate = Instances.DateOperator.From_YYYYMMDD("20220819");
+
+            return this.CompareFilesForTwoDates(
+                olderDate,
+                newerDate);
+        }
+
+        private Task CompareFilesForTwoDates(
+            DateTime olderDate,
+            DateTime newerDate)
+        {
+            /// Inputs.
+            var outputDirectoryPath = Instances.DirectoryPaths.OutputDirectoryPath;
 
             /// Run.
             // First create all file paths.
@@ -424,11 +523,18 @@ namespace R5T.S0041
         private Task CreateDatedFiles()
         {
             /// Inputs.
-            var outputDirectoryPath = @"C:\Temp\Output\S0041\";
-
             var date = Instances.DateOperator.GetToday();
             //var date = Instances.DateOperator.GetYesterday();
             //var date = Instances.DateOperator.From_YYYYMMDD("20220727");
+
+            return this.CreateDatedFiles(date);
+        }
+            
+        private Task CreateDatedFiles(DateTime date)
+        {
+            /// Inputs.
+            var outputDirectoryPath = Instances.DirectoryPaths.OutputDirectoryPath;
+
 
             /// Run.
             // Get source and destination paths for all varieties.
@@ -482,9 +588,10 @@ namespace R5T.S0041
 
             /// Run.
             var projectFilesTuples = Instances.Operations.GetProjectFilesTuples(useProjectsCache)
-                //// For debugging.
-                //.Where(x => x.ProjectFilePath == @"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.T0142\source\R5T.T0142\R5T.T0142.csproj")
+                ////// For debugging.
+                //.Where(x => x.ProjectFilePath == @"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.F0035\source\R5T.F0035\R5T.F0035.csproj")
                 //.Now()
+                ////
                 ;
 
             // Assembly actions.
@@ -508,7 +615,7 @@ namespace R5T.S0041
                 { Instances.InstanceVariety.Values, Instances.NamespacedTypeNames.ValuesMarkerAttribute },
                 { Instances.InstanceVariety.DraftValues, Instances.NamespacedTypeNames.DraftValuesMarkerAttribute },
                 { Instances.InstanceVariety.Constants, Instances.NamespacedTypeNames.ConstantsMarkerAttribute },
-                { Instances.InstanceVariety.DraftConstants, Instances.NamespacedTypeNames.DraftsConstantsMarkerInterface },
+                { Instances.InstanceVariety.DraftConstants, Instances.NamespacedTypeNames.DraftsConstantsMarkerAttribute },
             };
 
             // Type name data of types for which we want type names.
@@ -516,10 +623,21 @@ namespace R5T.S0041
             {
                 { Instances.InstanceVariety.MarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.MarkerAttributeMarkerAttribute>() },
                 { Instances.InstanceVariety.DraftMarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.DraftMarkerAttributeMarkerAttribute>() },
+                { Instances.InstanceVariety.ContextDefinition, Instances.NamespacedTypeNames.ContextDefinitionMarkerAttribute },
+                { Instances.InstanceVariety.ContextImplementation, Instances.NamespacedTypeNames.ContextImplementationMarkerAttribute },
+                { Instances.InstanceVariety.ContextType, Instances.NamespacedTypeNames.ContextTypeMarkerAttribute },
+                { Instances.InstanceVariety.DraftContextType, Instances.NamespacedTypeNames.DraftContextTypeMarkerAttribute },
                 { Instances.InstanceVariety.DataType, Instances.NamespacedTypeNames.DataTypeMarkerAttribute },
                 { Instances.InstanceVariety.DraftDataType, Instances.NamespacedTypeNames.DraftDataTypeMarkerAttribute },
                 { Instances.InstanceVariety.UtilityType, Instances.NamespacedTypeNames.UtilityTypeMarkerAttribute },
                 { Instances.InstanceVariety.DraftUtilityType, Instances.NamespacedTypeNames.DraftUtilityTypeMarkerAttribute },
+                { Instances.InstanceVariety.Type, Instances.NamespacedTypeNames.TypeMarkerAttribute },
+                { Instances.InstanceVariety.DraftType, Instances.NamespacedTypeNames.DraftTypeMarkerAttribute },
+
+                { Instances.InstanceVariety.ServiceDefinitions, Instances.NamespacedTypeNames.ServiceDefinitionMarkerAttribute },
+                { Instances.InstanceVariety.ServiceImplementations, Instances.NamespacedTypeNames.ServiceImplementationMarkerAttribute },
+                { Instances.InstanceVariety.DraftServiceDefinitions, Instances.NamespacedTypeNames.DraftServiceDefinitionMarkerAttribute },
+                { Instances.InstanceVariety.DraftServiceImplementations, Instances.NamespacedTypeNames.DraftServiceImplementationMarkerAttribute },
             };
 
             // Build the closures that will perform Assembly => InstancesIdentityNames for each type of code element (method or property), for each variety of instance (functionality, explorations, etc.).
@@ -529,6 +647,9 @@ namespace R5T.S0041
                     .Select(xPair => (xPair.Key, Instances.Operations.GetInstancePropertyNamesProviderFunction(xPair.Value))))
                 .Append(instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName
                     .Select(xPair => (xPair.Key, Instances.Operations.GetInstanceTypeNamesProviderFunction(xPair.Value))))
+                //// For debugging.
+                //.Where(x => x.Key == Instances.InstanceVariety.MarkerAttribute)
+                ////
                 .ToDictionary(
                     x => x.Key,
                     x => x.Item2);
@@ -601,11 +722,8 @@ namespace R5T.S0041
             // Show problem projects.
             await this.NotepadPlusPlusOperator.OpenFilePath(problemProjectsFilePath);
 
-            // Show output data.
-            await textOutputFilePaths
-                // Show summary last.
-                .Append(summaryFilePath)
-                .ForEach(async x => await this.NotepadPlusPlusOperator.OpenFilePath(x));
+            // Show summary file.
+            await this.NotepadPlusPlusOperator.OpenFilePath(summaryFilePath);
         }
 
         /// <summary>
@@ -620,9 +738,9 @@ namespace R5T.S0041
             /// Run.
             // Setup per-variety operations.
             var instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName = new Dictionary<string, string>
-        {
-            { Instances.InstanceVariety.MarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.MarkerAttributeMarkerAttribute>() },
-        };
+            {
+                { Instances.InstanceVariety.MarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.MarkerAttributeMarkerAttribute>() },
+            };
 
             var getInstanceIdentityNamesByInstanceVariety = instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName
                 .Select(xPair => (xPair.Key, Instances.Operations.GetInstanceTypeNamesProviderFunction(xPair.Value)))
@@ -776,7 +894,7 @@ namespace R5T.S0041
                                 {
                                     var descriptionXml = documentationByMethodIdentityName[x.IdentityName].Exists
                                         ? documentationByMethodIdentityName[x.IdentityName]
-                                        : String.Empty
+                                        : Instances.Strings.Empty
                                         ;
 
                                     var output = new InstanceDescriptor
@@ -910,7 +1028,7 @@ namespace R5T.S0041
                                 {
                                     var descriptionXml = documentationByMethodIdentityName[x.IdentityName].Exists
                                         ? documentationByMethodIdentityName[x.IdentityName]
-                                        : String.Empty
+                                        : Instances.Strings.Empty
                                         ;
 
                                     var output = new InstanceDescriptor
@@ -1085,7 +1203,7 @@ namespace R5T.S0041
                     .Append(xPair.Value
                         .OrderAlphabetically()
                         .Select(x => $"\t{x}"))
-                    .Append(String.Empty))
+                    .Append(Instances.Strings.Empty))
                 .Now();
 
             await FileHelper.WriteAllLines(
@@ -1145,7 +1263,8 @@ namespace R5T.S0041
                         var assemblyFileExists = Instances.FileSystemOperator.FileExists(tuple.AssemblyFilePath);
                         if (!assemblyFileExists)
                         {
-                            throw new Exception("Assembly file did not exist.");
+                            //throw new FileNotFoundException("Assembly file did not exist.", tuple.AssemblyFilePath);
+                            throw new FileNotFoundException("Assembly file did not exist.");
                         }
 
                         var hasDraftFunctionalityTypes = Instances.Operations.AssemblyHasDraftFunctionalityTypes(
@@ -1186,7 +1305,7 @@ namespace R5T.S0041
                             .Append("***\n")));
 
                 // Show problems.
-                var notepadPlusPlus = this.ServiceProvider.GetRequiredService<D0105.INotepadPlusPlusOperator>();
+                var notepadPlusPlus = this.ServiceProvider.GetRequiredService<INotepadPlusPlusOperator>();
 
                 await notepadPlusPlus.OpenFilePath(problemProjectsFilePath);
 
@@ -1205,7 +1324,7 @@ namespace R5T.S0041
                     .Append(xPair.Value
                         .OrderAlphabetically()
                         .Select(x => $"\t{x}"))
-                    .Append(String.Empty))
+                    .Append(Instances.Strings.Empty))
                 .Now();
 
             await FileHelper.WriteAllLines(
@@ -1257,8 +1376,8 @@ namespace R5T.S0041
             var projectFileTuples = allProjectFilePaths
                 .Select(xProjectFilePath =>
                 {
-                    var projectAssemblyFilePath = Instances.Operations.GetAssemblyFilePathForProjectFilePath(xProjectFilePath);
-                    var documentationFilePath = Instances.Operations.GetDocumentationFilePathForProjectFilePath(xProjectFilePath);
+                    var projectAssemblyFilePath = F0040.ProjectPathsOperator.Instance.GetAssemblyFilePathForProjectFilePath(xProjectFilePath);
+                    var documentationFilePath = F0040.ProjectPathsOperator.Instance.GetDocumentationFilePathForProjectFilePath(xProjectFilePath);
 
                     var output = new ProjectFilesTuple
                     {

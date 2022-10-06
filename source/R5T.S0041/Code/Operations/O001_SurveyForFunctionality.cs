@@ -8,9 +8,8 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
-using R5T.Magyar;
-
 using R5T.D0105;
+using R5T.F0000;
 using R5T.T0020;
 
 

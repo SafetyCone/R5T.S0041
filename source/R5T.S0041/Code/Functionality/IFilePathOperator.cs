@@ -10,6 +10,46 @@ namespace R5T.S0041
 	[FunctionalityMarker]
 	public partial interface IFilePathOperator : IFunctionalityMarker
 	{
+		public string[] GetAllCloudTextOutputFilePaths_InPresentationOrder()
+        {
+			var instanceVarietyNames = Instances.InstanceVarietyOperator.GetAllInstanceVarietyNames_InPresentationOrder();
+
+			var textOutputFilePaths = instanceVarietyNames
+				.Select(instanceVarietyName => Instances.FilePathOperator.GetTextOutputFilePath_ForInstanceVariety(instanceVarietyName))
+				;
+
+			var cloudOutputTextFilePaths = textOutputFilePaths
+				.Select(textOutputFilePath => Instances.PathOperator.GetDestinationFilePath(
+					textOutputFilePath,
+					Instances.DirectoryPaths.CloudOutputDirectoryPath))
+				.ToArray();
+
+			return cloudOutputTextFilePaths;
+		}
+
+		public string[] GetAllCloudTextOutputFilePaths()
+        {
+			var allTextOutputFilePaths = this.GetAllTextOutputFilePaths();
+
+			var allCloudTextOutputFilePaths = Instances.PathOperator.GetDestinationFilePaths(
+				allTextOutputFilePaths,
+				Instances.DirectoryPaths.CloudOutputDirectoryPath)
+				.ToArray();
+
+			return allCloudTextOutputFilePaths;
+        }
+
+		public string[] GetAllTextOutputFilePaths()
+        {
+			var allInstanceVarietyNames = Instances.InstanceVarietyOperator.GetAllInstanceVarietyNames();
+
+			var allInstanceVarietyTextOutputFilePaths = allInstanceVarietyNames
+				.Select(varietyName => Instances.FilePathOperator.GetTextOutputFilePath_ForInstanceVariety(varietyName))
+				.ToArray();
+
+			return allInstanceVarietyTextOutputFilePaths;
+		}
+
 		public string[] GetAllJsonOutputFilePaths()
         {
 			var allVarietyNames = Instances.InstanceVarietyOperator.GetAllInstanceVarietyNames();

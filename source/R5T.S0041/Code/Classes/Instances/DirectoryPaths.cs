@@ -7,7 +7,7 @@ namespace R5T.S0041
 	{
 		#region Infrastructure
 
-	    public static DirectoryPaths Instance { get; } = new();
+	    public static IDirectoryPaths Instance { get; } = new DirectoryPaths();
 
 	    private DirectoryPaths()
 	    {

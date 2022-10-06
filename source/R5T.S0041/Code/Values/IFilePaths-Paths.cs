@@ -75,5 +75,6 @@ namespace R5T.S0041
 		// Other files.
 		public string ProblemProjectsFilePath => @"C:\Temp\Problem Projects.txt";
 		public string SummaryFilePath => @"C:\Temp\Summary.txt";
+		public string SummaryPresentationFilePath => @"C:\Temp\Instances Summary.txt";
 	}
 }

@@ -1,6 +1,10 @@
-R5T.S0041 - Script to survey all functionality in local project files.
+# R5T.S0041
+Script to survey all functionality in local project files.
 
-Instructions:
+
+## Instructions
+
+Daily run:
 
 1. Run Program.RunMethod() -> GetAllDescriptors()
 2. Run Program.RunMethod() -> CreateDatedFiles()
@@ -15,6 +19,6 @@ To add attributes:
 2. Add values in: IInstanceVarietyOperator.GetAllInstanceVarietyNames().
 3. Modify: Program.GetAllDescriptors(), taking care to decided whether we want a method, a property, or a type.
 	A. Add namespaces in: R5T.Z0006\Code\Values\Interfaces\INamespacedTypeNames.cs
-4. Modify: Program.CreateSummaryPresentationFile(), make sure the instance names are in the desired order for output.
+4. Modify: IInstanceVarietyOperator.GetAllInstanceVarietyNames_InPresentationOrder(), make sure the instance names are in the desired order for output.
 
 That's it!

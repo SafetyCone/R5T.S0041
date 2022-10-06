@@ -11,8 +11,7 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
-using R5T.Magyar;
-
+using R5T.F0000;
 using R5T.T0132;
 
 
@@ -299,7 +298,8 @@ namespace R5T.S0041
                     var assemblyFileExists = Instances.FileSystemOperator.FileExists(tuple.AssemblyFilePath);
                     if (!assemblyFileExists)
                     {
-                        throw new Exception("Assembly file did not exist.");
+                        //throw new FileNotFoundException($"Assembly file did not exist: {tuple.AssemblyFilePath}", tuple.AssemblyFilePath);
+                        throw new FileNotFoundException($"Assembly file did not exist.");
                     }
 
                     // Else, run the provided action.
@@ -418,7 +418,7 @@ namespace R5T.S0041
 
             var descriptionXml = documentationByMemberIdentityName.ValueOrDefault(
                 identityName,
-                String.Empty);
+                Instances.Strings.Empty);
 
             var output = new InstanceDescriptor
             {
@@ -440,7 +440,7 @@ namespace R5T.S0041
 
             var descriptionXml = documentationByMethodIdentityName[identityName].Exists
                 ? documentationByMethodIdentityName[identityName]
-                : String.Empty
+                : Instances.Strings.Empty
                 ;
 
             var output = new InstanceDescriptor
@@ -468,64 +468,6 @@ namespace R5T.S0041
 
             return output;
         }
-
-        //public ProjectFilesTuple[] QueryProjectFilesTuples_AndWriteToFile(
-        //    bool requeryProjectFiles,
-        //    )
-        //{
-        //    var projectFilesTuplesJsonFilePath = this.GetProjectFilesTuplesJsonFilePath();
-
-        //    var projectFilePaths = this.GetProjectFiles(
-        //        requeryProjectFiles);
-
-        //    var problemProjects = new List<Failure<string>>();
-
-        //    var output = projectFilePaths
-        //        .Select(projectFilePath =>
-        //        {
-        //            var projectAssemblyFilePath = Instances.Operations.GetAssemblyFilePathForProjectFilePath(projectFilePath);
-        //            var documentationFilePath = Instances.Operations.GetDocumentationFilePathForProjectFilePath(projectFilePath);
-
-        //            var output = new ProjectFilesTuple
-        //            {
-        //                AssemblyFilePath = projectAssemblyFilePath,
-        //                DocumentationFilePath = documentationFilePath,
-        //                ProjectFilePath = projectFilePath,
-        //            };
-
-        //            return output;
-        //        })
-        //        .Where(tuple =>
-        //        {
-        //            var projectFileExists = Instances.FileSystemOperator.FileExists(tuple.ProjectFilePath);
-        //            if (!projectFileExists)
-        //            {
-        //                problemProjects.Add(
-        //                    Failure.Of(tuple.ProjectFilePath, "Project file did not exist."));
-
-        //                return false;
-        //            }
-
-        //            var assemblyFileExists = Instances.FileSystemOperator.FileExists(tuple.AssemblyFilePath);
-        //            if (!assemblyFileExists)
-        //            {
-        //                problemProjects.Add(
-        //                    Failure.Of(tuple.ProjectFilePath, "Assembly file did not exist."));
-        //            }
-
-        //            var output = projectFilesTupleFunction(tuple);
-        //            return output;
-
-                    
-        //        })
-        //        .Now();
-
-        //    JsonFileHelper.WriteToFile(
-        //        projectFilesTuplesJsonFilePath,
-        //        output);
-
-        //    return output;
-        //}
 
         public string[] GetProjectFiles(
             bool requeryProjectFiles)
@@ -625,16 +567,16 @@ namespace R5T.S0041
             IEnumerable<string> projectFilePaths)
         {
             var output = projectFilePaths
-                .Select(orojectFilePath =>
+                .Select(projectFilePath =>
                 {
-                    var projectAssemblyFilePath = Instances.Operations.GetAssemblyFilePathForProjectFilePath(orojectFilePath);
-                    var documentationFilePath = Instances.Operations.GetDocumentationFilePathForProjectFilePath(orojectFilePath);
+                    var projectAssemblyFilePath = F0040.ProjectPathsOperator.Instance.GetAssemblyFilePathForProjectFilePath(projectFilePath);
+                    var documentationFilePath = F0040.ProjectPathsOperator.Instance.GetDocumentationFilePathForProjectFilePath(projectFilePath);
 
                     var output = new ProjectFilesTuple
                     {
                         AssemblyFilePath = projectAssemblyFilePath,
                         DocumentationFilePath = documentationFilePath,
-                        ProjectFilePath = orojectFilePath,
+                        ProjectFilePath = projectFilePath,
                     };
 
                     return output;
@@ -667,7 +609,7 @@ namespace R5T.S0041
                         .Append(xGroup
                             .OrderAlphabetically(x => x.IdentityName)
                             .Select(x => $"\t{x.IdentityName}")
-                            .Append(String.Empty))));
+                            .Append(Instances.Strings.Empty))));
 
             return FileHelper.WriteAllLines(
                 outputFilePath,
@@ -780,7 +722,7 @@ namespace R5T.S0041
             // Perform all assembly actions on the assembly.
             Instances.ReflectionOperator.InAssemblyContext(
                 tuple.AssemblyFilePath,
-                EnumerableHelper.From(@"C:\Users\David\Dropbox\Organizations\Rivet\Shared\Binaries\Nuget Assemblies\"),
+                EnumerableOperator.Instance.From(Instances.DirectoryPaths.NuGetAssemblies),
                 assembly =>
                 {
                     getInstanceIdentityNamesByInstanceVariety.ForEach(
@@ -833,23 +775,12 @@ namespace R5T.S0041
             return output;
         }
 
-        public IEnumerable<TypeInfo> SelectTypes(
-            Assembly assembly,
-            Func<TypeInfo, bool> typeSelector)
-        {
-            var output = assembly.DefinedTypes
-                .Where(typeSelector)
-                ;
-
-            return output;
-        }
-
         public IEnumerable<(TypeInfo TypeInfo, MethodInfo MethodInfo)> SelectMethodsOnTypes(
             Assembly assembly,
             Func<TypeInfo, bool> typeSelector,
             Func<MethodInfo, bool> methodSelector)
         {
-            var output = this.SelectTypes(assembly, typeSelector)
+            var output = AssemblyOperator.Instance.SelectTypes(assembly, typeSelector)
                 .SelectMany(typeInfo => typeInfo.DeclaredMethods
                     .Where(methodSelector)
                     .Select(methodInfo => (typeInfo, methodInfo)));
@@ -869,16 +800,6 @@ namespace R5T.S0041
                     .Select(propertyInfo => (typeInfo, propertyInfo)));
 
             return output;
-        }
-
-        public void ForTypes(
-            Assembly assembly,
-            Func<TypeInfo, bool> typeSelector,
-            Action<TypeInfo> action)
-        {
-            var types = this.SelectTypes(assembly, typeSelector);
-
-            types.ForEach(typeInfo => action(typeInfo));
         }
 
         public void ForMethodsOnTypes(
@@ -916,7 +837,7 @@ namespace R5T.S0041
             {
                 var functionalityMethodNamesSet = new List<InstanceIdentityNames>();
 
-                Instances.Operations.ForTypes(
+                AssemblyOperator.Instance.ForTypes(
                     assembly,
                     Instances.Operations.GetInstanceTypeByMarkerAttributeNamespacedTypeNamePredicate(markerAttributeNamespacedTypeName),
                     typeInfo =>
@@ -1202,33 +1123,10 @@ namespace R5T.S0041
             return Internal;
         }
 
-        public bool HasAttributeOfType(
-            TypeInfo typeInfo,
-            string attributeTypeNamespacedTypeName)
-        {
-            var output = typeInfo.CustomAttributes
-                .Where(xAttribute => xAttribute.AttributeType.FullName == attributeTypeNamespacedTypeName)
-                .Any();
-
-            return output;
-        }
-
         public Func<TypeInfo, bool> GetInstanceTypeByMarkerAttributeNamespacedTypeNamePredicate(
             string markerAttributeNamespacedTypeName)
         {
-            bool Internal(TypeInfo typeInfo)
-            {
-                var output = true
-                   // Does it have the functionality marker attribute?
-                   && this.HasAttributeOfType(
-                       typeInfo,
-                       markerAttributeNamespacedTypeName)
-                   ;
-
-                return output;
-            }
-
-            return Internal;
+            return F0018.TypeOperator.Instance.GetTypeByHasAttributeOfNamespacedTypeNamePredicate(markerAttributeNamespacedTypeName);
         }
 
         /// <summary>
@@ -1267,54 +1165,6 @@ namespace R5T.S0041
             var output = assembly.DefinedTypes
                 .Where(predicate)
                 .Now();
-
-            return output;
-        }
-
-        /// <summary>
-        /// Gets the output documentation XML file path for a project file path (in the output directory).
-        /// </summary>
-        public string GetDocumentationFilePathForProjectFilePath(string projectFilePath)
-        {
-            var output = this.GetOutputDirectoryFilePathForProject(
-                projectFilePath,
-                projectName => $"{projectName}.xml");
-
-            return output;
-        }
-
-        /// <summary>
-        /// Gets the output assembly file path for a project file path (in the output directory).
-        /// </summary>
-        public string GetAssemblyFilePathForProjectFilePath(string projectFilePath)
-        {
-            var output = this.GetOutputDirectoryFilePathForProject(
-                projectFilePath,
-                projectName => $"{projectName}.dll");
-
-            return output;
-        }
-
-        /// <summary>
-        /// Gets the output directory file path for a project file path and a file name based on the project name.
-        /// </summary>
-        public string GetOutputDirectoryFilePathForProject(
-            string projectFilePath,
-            Func<string, string> fileNameProviderFromProjectName)
-        {
-            var projectDirectoryPath = Instances.PathOperator.GetParentDirectoryPath_ForFile(projectFilePath);
-
-            var binDebugNet5_0DirectoryPath = Instances.PathOperator.GetDirectoryPath(
-                projectDirectoryPath,
-                @"bin\Debug\net5.0\");
-
-            var projectName = Instances.PathOperator.GetFileNameStem(projectFilePath);
-
-            var fileName = fileNameProviderFromProjectName(projectName);
-
-            var output = Instances.PathOperator.GetFilePath(
-                binDebugNet5_0DirectoryPath,
-                fileName);
 
             return output;
         }
