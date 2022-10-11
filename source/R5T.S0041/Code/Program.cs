@@ -110,8 +110,8 @@ namespace R5T.S0041
             //var date = Instances.DateOperator.GetDefault();
             //var date = Instances.DateOperator.From_YYYYMMDD("20220819");
 
-            //var olderDate = Instances.DateOperator.GetYesterday();
-            var olderDate = Instances.DateOperator.From_YYYYMMDD("20220929");
+            var olderDate = Instances.DateOperator.GetYesterday();
+            //var olderDate = Instances.DateOperator.From_YYYYMMDD("20220929");
 
 
             /// Run.

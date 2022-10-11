@@ -23,7 +23,7 @@ namespace R5T.S0041
         public static IFileNameOperator FileNameOperator { get; } = S0041.FileNameOperator.Instance;
         public static IFilePathOperator FilePathOperator { get; } = S0041.FilePathOperator.Instance;
         public static IFilePaths FilePaths { get; } = S0041.FilePaths.Instance;
-        public static IFileSystemOperator FileSystemOperator { get; } = F0000.FileSystemOperator.Instance;
+        public static F0000.IFileSystemOperator FileSystemOperator { get; } = F0000.FileSystemOperator.Instance;
         public static IHost Host { get; } = T0070.Host.Instance;
         public static IIdentityNameProvider IdentityNameProvider { get; } = F0017.F002.IdentityNameProvider.Instance;
         public static IInstanceVariety InstanceVariety { get; } = S0041.InstanceVariety.Instance;
