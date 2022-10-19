@@ -19,7 +19,7 @@ namespace R5T.S0041
         public static IDirectoryNameOperator DirectoryNameOperator { get; } = S0041.DirectoryNameOperator.Instance;
         public static IDirectoryPathOperator DirectoryPathOperator { get; } = S0041.DirectoryPathOperator.Instance;
         public static IDirectoryPaths DirectoryPaths { get; } = S0041.DirectoryPaths.Instance;
-        public static IFileExtensions FileExtensions { get; } = Z0010.FileExtensions.Instance;
+        public static Z0010.IFileExtensions FileExtensions { get; } = Z0010.FileExtensions.Instance;
         public static IFileNameOperator FileNameOperator { get; } = S0041.FileNameOperator.Instance;
         public static IFilePathOperator FilePathOperator { get; } = S0041.FilePathOperator.Instance;
         public static IFilePaths FilePaths { get; } = S0041.FilePaths.Instance;
