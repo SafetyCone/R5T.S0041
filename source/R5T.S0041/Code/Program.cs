@@ -111,7 +111,8 @@ namespace R5T.S0041
             //var date = Instances.DateOperator.From_YYYYMMDD("20220819");
 
             //var olderDate = Instances.DateOperator.GetYesterday();
-            var olderDate = Instances.DateOperator.From_YYYYMMDD("20221010");
+            //var olderDate = Instances.DateOperator.From_YYYYMMDD("20221010");
+            var olderDate = Instances.Operations.GetPriorComparisonDate(date);
 
 
             /// Run.
@@ -588,8 +589,8 @@ namespace R5T.S0041
 
             /// Run.
             var projectFilesTuples = Instances.Operations.GetProjectFilesTuples(useProjectsCache)
-                ////// For debugging.
-                //.Where(x => x.ProjectFilePath == @"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.F0035\source\R5T.F0035\R5T.F0035.csproj")
+                //// For debugging.
+                //.Where(x => x.ProjectFilePath == @"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.T0151\source\R5T.T0151\R5T.T0151.csproj")
                 //.Now()
                 ////
                 ;
@@ -631,6 +632,8 @@ namespace R5T.S0041
                 { Instances.InstanceVariety.DraftDataType, Instances.NamespacedTypeNames.DraftDataTypeMarkerAttribute },
                 { Instances.InstanceVariety.UtilityType, Instances.NamespacedTypeNames.UtilityTypeMarkerAttribute },
                 { Instances.InstanceVariety.DraftUtilityType, Instances.NamespacedTypeNames.DraftUtilityTypeMarkerAttribute },
+                { Instances.InstanceVariety.StrongType, Instances.NamespacedTypeNames.StrongTypeMarkerAttribute},
+                { Instances.InstanceVariety.DraftStrongType, Instances.NamespacedTypeNames.DraftStrongTypeMarkerAttribute },
                 { Instances.InstanceVariety.Type, Instances.NamespacedTypeNames.TypeMarkerAttribute },
                 { Instances.InstanceVariety.DraftType, Instances.NamespacedTypeNames.DraftTypeMarkerAttribute },
 

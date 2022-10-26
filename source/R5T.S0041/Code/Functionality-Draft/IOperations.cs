@@ -20,6 +20,42 @@ namespace R5T.S0041
     [DraftFunctionalityMarker]
     public partial interface IOperations : IDraftFunctionalityMarker
     {
+        public DateTime GetPriorComparisonDate(DateTime date)
+        {
+            var outputDirectoryPath = Instances.DirectoryPaths.OutputDirectoryPath;
+
+            // Look through the names of directories in the output directory.
+            var directoryPaths = Instances.FileSystemOperator.EnumerateAllChildDirectoryPaths(outputDirectoryPath);
+
+            // Find directories whose names are YYYYMMDDs,
+            var directoryDates = directoryPaths
+                .Select(directoryPath =>
+                {
+                    var directoryName = Instances.PathOperator.GetDirectoryNameOfDirectoryPath(directoryPath);
+
+                    var isYYYYMMDD = Instances.DateOperator.IsYYYYMMDD(directoryName);
+                    return isYYYYMMDD;
+                })
+                .Where(x => x.Exists)
+                // Only prior dates.
+                .Where(x => x.Result < date)
+                .Select(x => x.Result)
+                .Now();
+
+            // If none, return the default comparison date. Note: the date-to-date survey comparision has been implemented such that if a dated file path does not exist, an empty set of descriptors is returned.
+            if(directoryDates.None())
+            {
+                return SpecialDates.Instance.DefaultPriorComparisonDate;
+            }
+
+            // Sort those directories in reverse chronological order, and choose the most recent.
+            var mostRecentDate = directoryDates
+                .OrderReverseChronologically()
+                .First();
+
+            return mostRecentDate;
+        }
+
         public Func<Assembly, InstanceIdentityNames[]> GetInstancePropertyNamesProviderFunction(
             string markerAttributeNamespacedTypeName)
         {
@@ -48,7 +84,7 @@ namespace R5T.S0041
         {
             var output = true
                 // Only properties with get methods.
-                && propertyInfo.GetMethod is object
+                && propertyInfo.GetMethod is not null
                 // Only properties with public get methods.
                 && propertyInfo.GetMethod.IsPublic
                 // Only properties *without* set methods.
@@ -644,7 +680,7 @@ namespace R5T.S0041
 
                 var membersNode = documentation.XPathSelectElement("//doc/members");
 
-                var membersNodeExists = membersNode is object;
+                var membersNodeExists = membersNode is not null;
                 if (membersNodeExists)
                 {
                     var memberNodes = membersNode.XPathSelectElements("member");
@@ -672,7 +708,7 @@ namespace R5T.S0041
 
                 var membersNode = documentation.XPathSelectElement("//doc/members");
 
-                var membersNodeExists = membersNode is object;
+                var membersNodeExists = membersNode is not null;
                 if(membersNodeExists)
                 {
                     var output = memberIdentityNames
@@ -682,7 +718,7 @@ namespace R5T.S0041
 
                             var memberNode = membersNode.XPathSelectElement(query);
 
-                            var memberNodeExists = memberNode is object;
+                            var memberNodeExists = memberNode is not null;
                             var wasFound = memberNodeExists
                                 ? WasFound.Found(memberNode.FirstNode.ToString())
                                 : WasFound.NotFound<string>()
