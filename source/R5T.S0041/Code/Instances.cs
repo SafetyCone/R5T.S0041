@@ -34,7 +34,7 @@ namespace R5T.S0041
         public static Functionalities.IOperations Operations { get; } = Functionalities.Operations.Instance;
         public static IReflectionOperator ReflectionOperator { get; } = F0018.ReflectionOperator.Instance;
         public static IServiceAction ServiceAction { get; } = T0062.ServiceAction.Instance;
-        public static IStrings Strings { get; } = Z0000.Strings.Instance;
+        public static Z0000.IStrings Strings { get; } = Z0000.Strings.Instance;
         public static ITypeOperator TypeOperator { get; } = S0041.TypeOperator.Instance;
     }
 }
