@@ -1,11 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\davidcoats\D8S.Z0003.Private\source\D8S.Z0003\D8S.Z0003.csproj" />
     <ProjectReference Include="..\..\..\R5T.F0000\source\R5T.F0000\R5T.F0000.csproj" />
     <ProjectReference Include="..\..\..\R5T.F0017\source\R5T.F0017.F002\R5T.F0017.F002.csproj" />
     <ProjectReference Include="..\..\..\R5T.F0018\source\R5T.F0018\R5T.F0018.csproj" />
     <ProjectReference Include="..\..\..\R5T.F0020\source\R5T.F0020\R5T.F0020.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0027\source\R5T.F0027\R5T.F0027.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0032\source\R5T.F0032\R5T.F0032.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0033\source\R5T.F0033\R5T.F0033.csproj" />
     <ProjectReference Include="..\..\..\R5T.F0034\source\R5T.F0034\R5T.F0034.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0035\source\R5T.F0035\R5T.F0035.csproj" />
     <ProjectReference Include="..\..\..\R5T.F0040\source\R5T.F0040\R5T.F0040.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0082\source\R5T.F0082\R5T.F0082.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0097\source\R5T.F0097\R5T.F0097.csproj" />
     <ProjectReference Include="..\..\..\R5T.L0019\source\R5T.L0019.X001\R5T.L0019.X001.csproj" />
     <ProjectReference Include="..\..\..\R5T.Magyar\source\R5T.Magyar\R5T.Magyar.csproj" />
     <ProjectReference Include="..\..\..\R5T.D0088\source\R5T.D0088.X001\R5T.D0088.X001.csproj" />
@@ -26,6 +33,10 @@
     <ProjectReference Include="..\..\..\R5T.D0105\source\R5T.D0105.I001\R5T.D0105.I001.csproj" />
     <ProjectReference Include="..\..\..\R5T.Z0006\source\R5T.Z0006\R5T.Z0006.csproj" />
     <ProjectReference Include="..\..\..\R5T.Z0010\source\R5T.Z0010\R5T.Z0010.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0012\source\R5T.Z0012\R5T.Z0012.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0015\source\R5T.Z0015\R5T.Z0015.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0022.Private\source\R5T.Z0022\R5T.Z0022.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0025\source\R5T.Z0025\R5T.Z0025.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>

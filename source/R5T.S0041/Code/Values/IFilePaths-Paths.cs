@@ -76,5 +76,7 @@ namespace R5T.S0041
 		public string ProblemProjectsFilePath => @"C:\Temp\Problem Projects.txt";
 		public string SummaryFilePath => @"C:\Temp\Summary.txt";
 		public string SummaryPresentationFilePath => @"C:\Temp\Instances Summary.txt";
+
+		public string InstancesJsonFilePath => @"C:\Temp\Instances.json";
 	}
 }

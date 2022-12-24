@@ -17,7 +17,6 @@ using R5T.D0090;
 using R5T.D0105;
 using R5T.F0000;
 
-
 namespace R5T.S0041
 {
     partial class Program : ProgramAsAServiceBase
@@ -69,38 +68,62 @@ namespace R5T.S0041
             //return this.ServiceProvider.Run<O002_SurveyForDraftFunctionality>();
         }
 
-        private Task RunMethod()
+        private async Task RunMethod()
         {
-            //return Task.Run(() => Instances.Operations.QueryProjectFiles_AndWriteToFile());
-            //return Task.Run(() => Instances.Operations.QueryProjectFilesTuples_AndWriteToFile());
-
-            //return this.GetAllTypesWithMarkerAttributeMarkerAttribute();
-
-            //return this.ListTypesAndAttributesInAssembly();
-            //return this.ListTypesAndTheirImplementedInterfacesInAssembly();
-            //return this.FindFunctionalityTypesInAssembly();
-            //return this.GetAllProjectFilesTuples();
-            //return this.GetAllDraftFunctionalityInterfaces();
-            //return this.GetAllDraftFunctionalityMethods();
-            //return this.GetDraftFunctionalityDescriptors();
-            //return this.GetFunctionalityDescriptors();
-
             // To add marker attributes, see project plan file.
-            return this.Run();
 
-            ///// Run these in order:
-            //return this.GetAllDescriptors();
-            //return this.CopyOutputFilesToCloudDirectory();
-            //return this.CreateDatedFiles();
-            //return this.CompareFilesForTwoDates();
-            //return this.CreateSummaryFile();
-            //return this.CreateSummaryPresentationFile();
+            /// Main
+            //await this.Run();
+
+            ///// Or run these in order:
+            //await this.GetAllDescriptors();
+            //await this.CopyOutputFilesToCloudDirectory();
+            //await this.CreateDatedFiles();
+            //await this.CompareFilesForTwoDates();
+            //await this.CreateSummaryFile();
+            //await this.CreateSummaryPresentationFile();
 
             /// Useful.
-            //return this.OpenOutputDirectory();
-            //return this.OpenCloudOutputDirectory();
-            //return this.OpenAllCloudOutputFiles();
-            //return this.OpenNugetAssembliesDirectory();
+            //await this.OpenOutputDirectory();
+            //await this.OpenCloudOutputDirectory();
+            //await this.OpenAllCloudOutputFiles();
+            //await this.OpenNugetAssembliesDirectory();
+
+            /// Construction
+            //Construction.Instance.OutputMethodName_WithParameterNames();
+            //Construction.Instance.ProcessAssembly();
+            //Construction.Instance.FindLatestModifiedFile();
+            //Construction.Instance.BuildAllProjectFilePaths_AndProcessAssemblies();
+
+            // Construction operation series for run.
+            //Construction.Instance.GetAllProjectFilePaths_OutputToDatedDirectory();
+            //Construction.Instance.BuildProjectFilePaths();
+            //Construction.Instance.CreateProjectFileTuples();
+            //Construction.Instance.ProcessBuiltProjects();
+            //Construction.Instance.SummarizeProcessing();
+            //Construction.Instance.CompareDates();
+            //Construction.Instance.SummarizeDatesComparison();
+            //Construction.Instance.SummarizeNewAndOldInstances();
+            Construction.Instance.SendResultsEmail();
+
+            //Construction.Instance.OutputInstanceSpecificFiles();
+            //Construction.Instance.CopyFilesToCloudSharedDirectory();
+            //Construction.Instance.OpenOutputFiles();
+
+            //await Task.Run(() => Instances.Operations.QueryProjectFiles_AndWriteToFile());
+            //await Task.Run(() => Instances.Operations.QueryProjectFilesTuples_AndWriteToFile());
+
+            //await this.GetAllTypesWithMarkerAttributeMarkerAttribute();
+
+            //await this.ListTypesAndAttributesInAssembly();
+            //await this.ListTypesAndTheirImplementedInterfacesInAssembly();
+            //await this.FindFunctionalityTypesInAssembly();
+            //await this.GetAllProjectFilesTuples();
+            //await this.GetAllDraftFunctionalityInterfaces();
+            //await this.GetAllDraftFunctionalityMethods();
+            //await this.GetDraftFunctionalityDescriptors();
+            //await this.GetFunctionalityDescriptors();
+
         }
 
         private async Task Run()
@@ -596,71 +619,13 @@ namespace R5T.S0041
                 ;
 
             // Assembly actions.
-            // Start with type name data.
-            // Type name data of types for which we want method names.
-            var methodNameMarkerAttributeNamespacedTypeNamesByInstanceVariety = new Dictionary<string, string>
-            {
-                { Instances.InstanceVariety.Functionality, Instances.NamespacedTypeNames.FunctionalityMarkerAttribute },
-                { Instances.InstanceVariety.DraftFunctionality, Instances.NamespacedTypeNames.DraftFunctionalityMarkerAttribute },
-                { Instances.InstanceVariety.Explorations, Instances.NamespacedTypeNames.ExplorationsMarkerAttribute },
-                { Instances.InstanceVariety.DraftExplorations, Instances.NamespacedTypeNames.DraftExplorationsMarkerAttribute },
-                { Instances.InstanceVariety.Experiments, Instances.NamespacedTypeNames.ExperimentsMarkerAttribute },
-                { Instances.InstanceVariety.DraftExperiments, Instances.NamespacedTypeNames.DraftExperimentsMarkerAttribute },
-                { Instances.InstanceVariety.Demonstrations, Instances.NamespacedTypeNames.DemonstrationsMarkerAttribute },
-                { Instances.InstanceVariety.DraftDemonstrations, Instances.NamespacedTypeNames.DraftDemonstrationsMarkerAttribute },
-            };
-
-            // Type name data of types for which we want property names.
-            var propertyNameMarkerAttributeNamespacedTypeNamesByInstanceVariety = new Dictionary<string, string>
-            {
-                { Instances.InstanceVariety.Values, Instances.NamespacedTypeNames.ValuesMarkerAttribute },
-                { Instances.InstanceVariety.DraftValues, Instances.NamespacedTypeNames.DraftValuesMarkerAttribute },
-                { Instances.InstanceVariety.Constants, Instances.NamespacedTypeNames.ConstantsMarkerAttribute },
-                { Instances.InstanceVariety.DraftConstants, Instances.NamespacedTypeNames.DraftsConstantsMarkerAttribute },
-            };
-
-            // Type name data of types for which we want type names.
-            var instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName = new Dictionary<string, string>
-            {
-                { Instances.InstanceVariety.MarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.MarkerAttributeMarkerAttribute>() },
-                { Instances.InstanceVariety.DraftMarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.DraftMarkerAttributeMarkerAttribute>() },
-                { Instances.InstanceVariety.ContextDefinition, Instances.NamespacedTypeNames.ContextDefinitionMarkerAttribute },
-                { Instances.InstanceVariety.ContextImplementation, Instances.NamespacedTypeNames.ContextImplementationMarkerAttribute },
-                { Instances.InstanceVariety.ContextType, Instances.NamespacedTypeNames.ContextTypeMarkerAttribute },
-                { Instances.InstanceVariety.DraftContextType, Instances.NamespacedTypeNames.DraftContextTypeMarkerAttribute },
-                { Instances.InstanceVariety.DataType, Instances.NamespacedTypeNames.DataTypeMarkerAttribute },
-                { Instances.InstanceVariety.DraftDataType, Instances.NamespacedTypeNames.DraftDataTypeMarkerAttribute },
-                { Instances.InstanceVariety.UtilityType, Instances.NamespacedTypeNames.UtilityTypeMarkerAttribute },
-                { Instances.InstanceVariety.DraftUtilityType, Instances.NamespacedTypeNames.DraftUtilityTypeMarkerAttribute },
-                { Instances.InstanceVariety.StrongType, Instances.NamespacedTypeNames.StrongTypeMarkerAttribute},
-                { Instances.InstanceVariety.DraftStrongType, Instances.NamespacedTypeNames.DraftStrongTypeMarkerAttribute },
-                { Instances.InstanceVariety.Type, Instances.NamespacedTypeNames.TypeMarkerAttribute },
-                { Instances.InstanceVariety.DraftType, Instances.NamespacedTypeNames.DraftTypeMarkerAttribute },
-
-                { Instances.InstanceVariety.ServiceDefinitions, Instances.NamespacedTypeNames.ServiceDefinitionMarkerAttribute },
-                { Instances.InstanceVariety.ServiceImplementations, Instances.NamespacedTypeNames.ServiceImplementationMarkerAttribute },
-                { Instances.InstanceVariety.DraftServiceDefinitions, Instances.NamespacedTypeNames.DraftServiceDefinitionMarkerAttribute },
-                { Instances.InstanceVariety.DraftServiceImplementations, Instances.NamespacedTypeNames.DraftServiceImplementationMarkerAttribute },
-            };
-
             // Build the closures that will perform Assembly => InstancesIdentityNames for each type of code element (method or property), for each variety of instance (functionality, explorations, etc.).
-            var getInstanceIdentityNamesByInstanceVariety = methodNameMarkerAttributeNamespacedTypeNamesByInstanceVariety
-                    .Select(xPair => (xPair.Key, Instances.Operations.GetInstanceMethodNamesProviderFunction(xPair.Value)))
-                .Append(propertyNameMarkerAttributeNamespacedTypeNamesByInstanceVariety
-                    .Select(xPair => (xPair.Key, Instances.Operations.GetInstancePropertyNamesProviderFunction(xPair.Value))))
-                .Append(instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName
-                    .Select(xPair => (xPair.Key, Instances.Operations.GetInstanceTypeNamesProviderFunction(xPair.Value))))
-                //// For debugging.
-                //.Where(x => x.Key == Instances.InstanceVariety.MarkerAttribute)
-                ////
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.Item2);
+            var intanceIdentityNamesProvidersByInstanceVariety = Operations.Instance.GetInstanceIdentityNamesProvidersByInstanceVariety();
 
             var functionalityDescriptorsByFunctionalityVariety = new Dictionary<string, List<InstanceDescriptor>>();
 
             // Pre-add all lists in case there are no successfully processed projects. This way, there will be zero elements for each variety.
-            foreach (var pair in getInstanceIdentityNamesByInstanceVariety)
+            foreach (var pair in intanceIdentityNamesProvidersByInstanceVariety)
             {
                 functionalityDescriptorsByFunctionalityVariety.Add(pair.Key, new List<InstanceDescriptor>());
             }
@@ -670,7 +635,7 @@ namespace R5T.S0041
                 this.Logger,
                 tuple => Instances.Operations.ProcessProjectFilesTuple(
                     tuple,
-                    getInstanceIdentityNamesByInstanceVariety,
+                    intanceIdentityNamesProvidersByInstanceVariety,
                     functionalityDescriptorsByFunctionalityVariety),
                 out var problemProjects);
 
@@ -682,11 +647,8 @@ namespace R5T.S0041
                 problemProjects);
 
             // Output data.
-            // Keep track of the output file paths we will want to later show.
-            var textOutputFilePaths = new List<string>();
-
             // Iterate over initial functionality methods so we can choose not to run some.
-            await getInstanceIdentityNamesByInstanceVariety.ForEach(
+            await intanceIdentityNamesProvidersByInstanceVariety.ForEach(
                 async pair =>
                 {
                     var functionalityDescriptors = functionalityDescriptorsByFunctionalityVariety[pair.Key];
@@ -696,14 +658,43 @@ namespace R5T.S0041
                     var jsonOutputFilePath = Instances.FilePathOperator.GetJsonOutputFilePath_ForInstanceVariety(varietyName);
                     var textOutputFilePath = Instances.FilePathOperator.GetTextOutputFilePath_ForInstanceVariety(varietyName);
 
-                    textOutputFilePaths.Add(textOutputFilePath);
-
                     await Instances.Operations.OutputFunctionalityFiles(
                         functionalityDescriptors,
                         varietyName,
                         jsonOutputFilePath,
                         textOutputFilePath);
                 });
+
+            // Output one single file.
+            var instances = intanceIdentityNamesProvidersByInstanceVariety
+                .SelectMany(pair =>
+                {
+                    var instanceVariety = pair.Key;
+
+                    var functionalityDescriptors = functionalityDescriptorsByFunctionalityVariety[instanceVariety];
+
+                    var instances = functionalityDescriptors
+                        .Select(functionalityDescriptor =>
+                        {
+                            var instanceDescriptor = new N002.InstanceDescriptor
+                            {
+                                InstanceVariety = instanceVariety,
+                                ProjectFilePath = functionalityDescriptor.ProjectFilePath,
+                                IdentityName = functionalityDescriptor.IdentityName,
+                                ParameterNamedIdentityName = functionalityDescriptor.ParameterNamedIdentityName,
+                                DescriptionXml = functionalityDescriptor.DescriptionXml,
+                            };
+
+                            return instanceDescriptor;
+                        });
+
+                    return instances;
+                })
+                .Now();
+
+            F0032.JsonOperator.Instance.Serialize_Synchronous(
+                FilePaths.Instance.InstancesJsonFilePath,
+                instances);
 
             // Output summary.
             var summaryFilePath = Instances.FilePaths.SummaryFilePath;
@@ -905,7 +896,7 @@ namespace R5T.S0041
                                         IdentityName = x.IdentityName,
                                         ParameterNamedIdentityName = x.ParameterNamedIdentityName,
                                         ProjectFilePath = tuple.ProjectFilePath,
-                                        DescriptionXML = descriptionXml
+                                        DescriptionXml = descriptionXml
                                     };
 
                                     return output;
@@ -1039,7 +1030,7 @@ namespace R5T.S0041
                                         IdentityName = x.IdentityName,
                                         ParameterNamedIdentityName = x.ParameterNamedIdentityName,
                                         ProjectFilePath = tuple.ProjectFilePath,
-                                        DescriptionXML = descriptionXml
+                                        DescriptionXml = descriptionXml
                                     };
 
                                     return output;

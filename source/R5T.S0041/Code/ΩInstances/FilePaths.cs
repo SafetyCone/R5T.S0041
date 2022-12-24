@@ -7,7 +7,8 @@ namespace R5T.S0041
 	{
 		#region Infrastructure
 
-	    public static FilePaths Instance { get; } = new();
+	    public static IFilePaths Instance { get; } = new FilePaths();
+
 
 	    private FilePaths()
 	    {

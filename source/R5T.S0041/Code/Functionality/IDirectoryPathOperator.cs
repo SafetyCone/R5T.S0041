@@ -8,6 +8,18 @@ namespace R5T.S0041
 	[FunctionalityMarker]
 	public partial interface IDirectoryPathOperator : IFunctionalityMarker
 	{
+        public string GetDatedOutputDirectoryPath(
+            DateTime date)
+        {
+            var outputDirectoryPath = Instances.DirectoryPaths.OutputDirectoryPath;
+
+            var datedOutputDirectoryPath = Instances.DirectoryPathOperator.GetDatedChildDirectoryPath(
+                outputDirectoryPath,
+                date);
+
+            return datedOutputDirectoryPath;
+        }
+
         public string GetDatedChildDirectoryPath(
             string parentDirectoryPath,
             DateTime date)
@@ -19,6 +31,18 @@ namespace R5T.S0041
                 datedDirectoryName);
 
             return datedOutputDirectoryPath;
+        }
+
+        public string GetPublishDirectoryPath_ForProjectFilePath(string projectFilePath)
+        {
+            var projectDirectoryPath = F0052.ProjectPathsOperator.Instance.GetProjectDirectoryPath(projectFilePath);
+
+            var publishDirectoryPath = F0002.PathOperator.Instance.GetDirectoryPath(
+                projectDirectoryPath,
+                Instances.DirectoryNames.bin,
+                Instances.DirectoryNames.Publish);
+
+            return publishDirectoryPath;
         }
     }
 }

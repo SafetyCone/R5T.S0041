@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
+using R5T.Magyar.Extensions;
+
 using R5T.F0000;
 using R5T.T0132;
 
@@ -20,6 +22,228 @@ namespace R5T.S0041
     [DraftFunctionalityMarker]
     public partial interface IOperations : IDraftFunctionalityMarker
     {
+        public void BuildProject(
+            string projectFilePath,
+            ILogger logger,
+            Dictionary<string, string> buildProblemTextsByProjectFilePath)
+        {
+            try
+            {
+                Instances.Operations.BuildProject(
+                    projectFilePath,
+                    logger);
+            }
+            catch (AggregateException aggregateException)
+            {
+                logger.LogWarning("Failed to build project.");
+
+                // Combine aggregate exception messages to text.
+                var buildProblemText = Instances.StringOperator.Join(
+                    Instances.Characters.NewLine,
+                    aggregateException.InnerExceptions
+                        .Select(exception => exception.Message));
+
+                buildProblemTextsByProjectFilePath.Add(
+                    projectFilePath,
+                    buildProblemText);
+            }
+
+            // Output an S0041-specific file (R5T.S0041.Build.json) containing build time to publish directory.
+            // Output this regardless of build success so that projects are not rebuilt in either case until project files change.
+            var buildTime = Instances.NowOperator.GetNow_Local();
+
+            var buildResult = new BuildResult
+            {
+                Timestamp = buildTime,
+            };
+
+            var buildJsonFilePath = Instances.FilePathProvider.Get_BuildJsonFilePath(projectFilePath);
+
+            Instances.JsonOperator.Serialize_Synchronous(
+                buildJsonFilePath,
+                buildResult);
+        }
+
+        public void BuildProject(
+            string projectFilePath,
+            ILogger logger)
+        {
+            var publishDirectoryPath = Instances.DirectoryPathOperator.GetPublishDirectoryPath_ForProjectFilePath(projectFilePath);
+
+            Instances.FileSystemOperator.ClearDirectory_Synchronous(publishDirectoryPath);
+
+            Instances.DotnetPublishOperator.Publish(
+                projectFilePath,
+                publishDirectoryPath);
+
+            logger.LogInformation("Built project.");
+        }
+
+        public bool ShouldBuildProject(
+            string projectFilePath,
+            bool rebuildFailedBuildsToCollectErrors,
+            ILogger logger)
+        {
+            logger.LogInformation("Determining whether the project should be built:\n\t{projectFilePath}", projectFilePath);
+
+            var neverBuiltBefore = this.ShouldBuildProject_NeverBuiltBefore(
+                projectFilePath,
+                logger);
+
+            if(neverBuiltBefore)
+            {
+                logger.LogInformation("Build project: never built (as part of this process).");
+
+                return true;
+            }
+
+            var anyChangesSinceLastBuild = this.ShouldBuildProject_AnyChangesSinceLastBuild(
+                projectFilePath,
+                logger);
+
+            if(anyChangesSinceLastBuild)
+            {
+                logger.LogInformation("Build project: changes found since last build.");
+
+                return true;
+            }
+
+            // At this point, we know *an attempt* to build project has been tried before, and that there were no changes since the last attempt.
+
+            // If the output assembly was not found, we should re-build the project.
+            var outputAssemblyNotFound = this.ShouldBuildProject_OutputAssemblyNotFound(
+                projectFilePath,
+                logger);
+
+            // But only if we want to wait to rebuild projects for which prior build attempts have failed.
+            var rebuildProjectAfterPriorFailedBuilds = outputAssemblyNotFound && rebuildFailedBuildsToCollectErrors;
+
+            if(rebuildProjectAfterPriorFailedBuilds)
+            {
+                logger.LogInformation("Build project: rebuild project after prior failure.");
+
+                return true;
+            }
+
+            logger.LogInformation("Do not build project.");
+
+            return false;
+        }
+
+        /// <summary>
+        /// If the project has never been built before (as part of this process), it should be built.
+        /// </summary>
+        public bool ShouldBuildProject_NeverBuiltBefore(
+            string projectFilePath,
+            ILogger logger)
+        {
+            // Determine whether the project has been built before as part of this process by testing for the existence of the output build file specific to this process.
+            var hasBuildResultFile = Instances.FileSystemOperator.Has_BuildResultFile(projectFilePath);
+
+            if (hasBuildResultFile)
+            {
+                logger.LogInformation("Should not build: already built (as part of this process).");
+                return false;
+            }
+            else
+            {
+                logger.LogInformation("Should build: never built (as part of this process).");
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// If a project has not been built (built during a prior run of this process, then it should be built).
+        /// </summary>
+        public bool ShouldBuildProject_OutputAssemblyNotFound(
+            string projectFilePath,
+            ILogger logger)
+        {
+            var outputAssemblyExists = Instances.FileSystemOperator.Has_OutputAssembly(projectFilePath);
+            if (outputAssemblyExists)
+            {
+                logger.LogInformation("Should not build: output assembly already exists.");
+                return false;
+            }
+            else
+            {
+                logger.LogInformation("Should build: output assembly does not exist.");
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// If a project has not changed since the last time it was built, then it should not be built (re-built).
+        /// For the specific application of determining instances within a project, we only need to rebuild a project if files within that project have changed.
+        /// Note: but for the general case of determining whether a project should be rebuilt, an examination of all files in the full recursive project references hierarchy should be performed (even including NuGet package reference update rules evaluation).
+        /// </summary>
+        public bool ShouldBuildProject_AnyChangesSinceLastBuild(
+            string projectFilePath,
+            ILogger logger)
+        {
+            // Assume that a project should be built.
+            var shouldBuildProject = true;
+
+            // Check latest file write time in project directory against build time in publish directory (R5T.S0041.Build.json).
+            var projectDirectoryPath = Instances.ProjectPathsOperator.GetProjectDirectoryPath(projectFilePath);
+
+            var projectFilesLastModifiedTime = F0000.FileSystemOperator.Instance.GetLastModifiedTime_ForDirectory_Local(
+                projectDirectoryPath,
+                Instances.DirectoryNameOperator.IsNotBinariesOrObjectsDirectory);
+
+            var publishDirectoryPath = Instances.DirectoryPathOperator.GetPublishDirectoryPath_ForProjectFilePath(projectFilePath);
+
+            var buildJsonFilePath = Instances.FilePathProvider.Get_BuildJsonFilePath_FromPublishDirectory(publishDirectoryPath);
+
+            var buildJsonFileExists = Instances.FileSystemOperator.FileExists(buildJsonFilePath);
+            if(buildJsonFileExists)
+            {
+                var buildResult = Instances.JsonOperator.Deserialize_Synchronous<BuildResult>(
+                    buildJsonFilePath);
+
+                var lastBuildTime = buildResult.Timestamp;
+
+                // If the last build time is greater than latest file write time, skip building project.
+                var skipRepublishProject = lastBuildTime > projectFilesLastModifiedTime;
+                if (skipRepublishProject)
+                {
+                    logger.LogInformation("Skip building project. (Project files last modified time: {projectFilesLastModifiedTime}, last build time: {lastBuildTime}", projectFilesLastModifiedTime, lastBuildTime);
+
+                    shouldBuildProject = false;
+                }
+            }
+
+            return shouldBuildProject;
+        }
+
+        public Dictionary<string, Func<Assembly, InstanceIdentityNames[]>> GetInstanceIdentityNamesProvidersByInstanceVariety()
+        {
+            // Type name data of types for which we want method names.
+            var methodNameMarkerAttributeNamespacedTypeNamesByInstanceVariety = Values.Instance.MethodNameMarkerAttributeNamespacedTypeNamesByInstanceVariety;
+
+            // Type name data of types for which we want property names.
+            var propertyNameMarkerAttributeNamespacedTypeNamesByInstanceVariety = Values.Instance.PropertyNameMarkerAttributeNamespacedTypeNamesByInstanceVariety;
+
+            // Type name data of types for which we want type names.
+            var instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName = Values.Instance.InstanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName;
+
+            // Build the closures that will perform Assembly => InstancesIdentityNames for each type of code element (method or property), for each variety of instance (functionality, explorations, etc.).
+            var intanceIdentityNamesProvidersByInstanceVariety = methodNameMarkerAttributeNamespacedTypeNamesByInstanceVariety
+                    .Select(xPair => (xPair.Key, Instances.Operations.GetInstanceMethodNamesProviderFunction(xPair.Value)))
+                .Append(propertyNameMarkerAttributeNamespacedTypeNamesByInstanceVariety
+                    .Select(xPair => (xPair.Key, Instances.Operations.GetInstancePropertyNamesProviderFunction(xPair.Value))))
+                .Append(instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName
+                    .Select(xPair => (xPair.Key, Instances.Operations.GetInstanceTypeNamesProviderFunction(xPair.Value))))
+                //// For debugging.
+                //.Where(x => x.Key == Instances.InstanceVariety.MarkerAttribute)
+                ////
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Item2);
+
+            return intanceIdentityNamesProvidersByInstanceVariety;
+        }
+
         public DateTime GetPriorComparisonDate(DateTime date)
         {
             var outputDirectoryPath = Instances.DirectoryPaths.OutputDirectoryPath;
@@ -461,7 +685,7 @@ namespace R5T.S0041
                 IdentityName = identityName,
                 ParameterNamedIdentityName = functionalityMethodNames.ParameterNamedIdentityName,
                 ProjectFilePath = projectFilePath,
-                DescriptionXML = descriptionXml
+                DescriptionXml = descriptionXml
             };
 
             return output;
@@ -484,7 +708,7 @@ namespace R5T.S0041
                 IdentityName = identityName,
                 ParameterNamedIdentityName = functionalityMethodNames.ParameterNamedIdentityName,
                 ProjectFilePath = projectFilePath,
-                DescriptionXML = descriptionXml
+                DescriptionXml = descriptionXml
             };
 
             return output;
@@ -668,6 +892,20 @@ namespace R5T.S0041
                             .Append("***\n"))));
         }
 
+        public void WriteProblemProjectsFile(
+            string problemProjectsFilePath,
+            Dictionary<string, string> problemProjects)
+        {
+            FileHelper.WriteAllLines_Synchronous(
+                problemProjectsFilePath,
+                EnumerableHelper.From($"Problem Projects, Count: {problemProjects.Count}\n\n")
+                    .Append(problemProjects
+                        .OrderAlphabetically(pair => pair.Key)
+                        .SelectMany(pair => EnumerableHelper.From($"{pair.Key}:")
+                            .Append(pair.Value)
+                            .Append("***\n"))));
+        }
+
         public Dictionary<string, string> GetDocumentationByMemberIdentityName(
             string documentationXmlFilePath)
         {
@@ -689,7 +927,9 @@ namespace R5T.S0041
                         var memberIdentityName = memberNode.Attribute("name").Value;
                         var documentationForMember = memberNode.FirstNode.ToString();
 
-                        output.Add(memberIdentityName, documentationForMember);
+                        var prettyPrintedDocumentationForMember = DocumentationOperator.Instance.PrettyPrint(documentationForMember);
+
+                        output.Add(memberIdentityName, prettyPrintedDocumentationForMember);
                     }
                 }
             }
@@ -697,9 +937,47 @@ namespace R5T.S0041
             return output;
         }
 
+        public string GetDocumentationForMemberIdentityName(
+            string documentationXmlFilePath,
+            string memberIdentityName)
+        {
+            var wasFound = this.HasDocumentationForMemberIdentityName(
+                documentationXmlFilePath,
+                memberIdentityName);
+
+            var output = WasFoundOperator.Instance.ResultOrExceptionIfNotFound(
+                wasFound,
+                $"{memberIdentityName}: No documentation for member.");
+
+            return output;
+        }
+
+        public WasFound<string> HasDocumentationForMemberIdentityName(
+            string documentationXmlFilePath,
+            string memberIdentityName)
+        {
+            var documentationForMemberIdentityNames = this.GetDocumentationForMemberIdentityNames(
+                documentationXmlFilePath,
+                memberIdentityName);
+
+            var wasFound = documentationForMemberIdentityNames[memberIdentityName];
+            return wasFound;
+        }
+
         public Dictionary<string, WasFound<string>> GetDocumentationForMemberIdentityNames(
-        IEnumerable<string> memberIdentityNames,
-        string documentationXmlFilePath)
+            string documentationXmlFilePath,
+            params string[] memberIdentityNames)
+        {
+            var output = this.GetDocumentationForMemberIdentityNames(
+                memberIdentityNames.AsEnumerable(),
+                documentationXmlFilePath);
+
+            return output;
+        }
+
+        public Dictionary<string, WasFound<string>> GetDocumentationForMemberIdentityNames(
+            IEnumerable<string> memberIdentityNames,
+            string documentationXmlFilePath)
         {
             var documentationFileExists = File.Exists(documentationXmlFilePath);
             if(documentationFileExists)
@@ -719,8 +997,19 @@ namespace R5T.S0041
                             var memberNode = membersNode.XPathSelectElement(query);
 
                             var memberNodeExists = memberNode is not null;
+
+                            var documentation = memberNodeExists
+                                ? memberNode.FirstNode.ToString()
+                                : null
+                                ;
+
+                            var prettyPrintedDocumentation = memberNodeExists
+                                ? DocumentationOperator.Instance.PrettyPrint(documentation)
+                                : null
+                                ;
+
                             var wasFound = memberNodeExists
-                                ? WasFound.Found(memberNode.FirstNode.ToString())
+                                ? WasFound.Found(prettyPrintedDocumentation)
                                 : WasFound.NotFound<string>()
                                 ;
 
@@ -742,6 +1031,103 @@ namespace R5T.S0041
                     x => WasFound.NotFound<string>());
 
             return defaultOutput;
+        }
+
+        public N002.InstanceDescriptor[] ProcessAssemblyFile(
+            string projectFilePath,
+            string assemblyFilePath,
+            string documentationForAssemblyFilePath)
+        {
+            var instanceDescriptorsWithoutProjectFile = this.ProcessAssemblyFile(
+                assemblyFilePath,
+                documentationForAssemblyFilePath);
+
+            var output = instanceDescriptorsWithoutProjectFile
+                .Select(x =>
+                {
+                    var instanceDescriptor = new N002.InstanceDescriptor
+                    {
+                        ProjectFilePath = projectFilePath,
+                        InstanceVariety = x.InstanceVariety,
+                        IdentityName = x.IdentityName,
+                        ParameterNamedIdentityName = x.ParameterNamedIdentityName,
+                        DescriptionXml = x.DescriptionXml,
+                    };
+
+                    return instanceDescriptor;
+                })
+                .Now();
+
+            return output;
+        }
+
+        public N003.InstanceDescriptor[] ProcessAssemblyFile(
+            string assemblyFilePath)
+        {
+            var documentationForAssemblyFilePath = F0040.ProjectPathsOperator.Instance.GetDocumentationFilePath_ForAssemblyFilePath(
+                assemblyFilePath);
+
+            return this.ProcessAssemblyFile(
+                assemblyFilePath,
+                documentationForAssemblyFilePath);
+        }
+
+        public N003.InstanceDescriptor[] ProcessAssemblyFile(
+            string assemblyFilePath,
+            string documentationForAssemblyFilePath)
+        {
+            var documentationByMemberIdentityName = Operations.Instance.GetDocumentationByMemberIdentityName(
+                documentationForAssemblyFilePath);
+
+            var intanceIdentityNamesProvidersByInstanceVariety = Operations.Instance.GetInstanceIdentityNamesProvidersByInstanceVariety();
+
+            var instanceIdentityNameSetsByVarietyType = Instances.ReflectionOperator.InAssemblyContext(
+                assemblyFilePath,
+                assembly =>
+                {
+                    var output = intanceIdentityNamesProvidersByInstanceVariety
+                        .Select(pair =>
+                        {
+                            var instanceIdentityNamesSet = pair.Value(assembly);
+
+                            return (pair.Key, instanceIdentityNamesSet);
+                        })
+                        .ToDictionary(
+                            x => x.Key,
+                            x => x.instanceIdentityNamesSet);
+
+                    return output;
+                });
+
+            var output = instanceIdentityNameSetsByVarietyType
+                .SelectMany(pair =>
+                {
+                    var instanceVariety = pair.Key;
+
+                    var output = pair.Value
+                        .Select(x =>
+                        {
+                            var documentationXml = documentationByMemberIdentityName.HasValue(x.IdentityName)
+                                ? documentationByMemberIdentityName[x.IdentityName]
+                                : default
+                                ;
+
+                            var output = new N003.InstanceDescriptor
+                            {
+                                InstanceVariety = instanceVariety,
+                                IdentityName = x.IdentityName,
+                                ParameterNamedIdentityName = x.ParameterNamedIdentityName,
+                                DescriptionXml = documentationXml,
+                            };
+
+                            return output;
+                        });
+
+                    return output;
+                })
+                .Now();
+
+            return output;
         }
 
         public void ProcessProjectFilesTuple(

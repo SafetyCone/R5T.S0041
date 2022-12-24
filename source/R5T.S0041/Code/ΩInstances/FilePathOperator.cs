@@ -7,7 +7,8 @@ namespace R5T.S0041
 	{
 		#region Infrastructure
 
-	    public static FilePathOperator Instance { get; } = new();
+	    public static IFilePathOperator Instance { get; } = new FilePathOperator();
+
 
 	    private FilePathOperator()
 	    {

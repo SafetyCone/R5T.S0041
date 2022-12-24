@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 
 namespace R5T.S0041
@@ -7,7 +7,8 @@ namespace R5T.S0041
     {
         #region Infrastructure
 
-        public static DirectoryNameOperator Instance { get; } = new();
+        public static IDirectoryNameOperator Instance { get; } = new DirectoryNameOperator();
+
 
         private DirectoryNameOperator()
         {

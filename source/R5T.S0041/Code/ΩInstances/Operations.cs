@@ -7,7 +7,7 @@ namespace R5T.S0041
     {
         #region Infrastructure
 
-        public static Operations Instance { get; } = new();
+        public static IOperations Instance { get; } = new Operations();
 
         private Operations()
         {
@@ -24,7 +24,7 @@ namespace R5T.S0041.Functionalities
     {
         #region Infrastructure
 
-        public static Operations Instance { get; } = new();
+        public static IOperations Instance { get; } = new Operations();
 
         private Operations()
         {

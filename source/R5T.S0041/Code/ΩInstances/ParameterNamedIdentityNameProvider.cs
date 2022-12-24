@@ -7,7 +7,7 @@ namespace R5T.S0041
     {
         #region Infrastructure
 
-        public static ParameterNamedIdentityNameProvider Instance { get; } = new();
+        public static IParameterNamedIdentityNameProvider Instance { get; } = new ParameterNamedIdentityNameProvider();
 
         private ParameterNamedIdentityNameProvider()
         {
