@@ -9,9 +9,9 @@ namespace R5T.S0041
     [DraftFunctionalityMarker]
     public partial interface IDirectoryNameOperator : IDraftFunctionalityMarker
     {
-        public string GetDatedDirectoryName(DateTime dateTime)
+        public string GetDatedDirectoryName(DateTime date)
         {
-            var output = this.GetDirectoryName_YYYYMMDD(dateTime);
+            var output = this.GetDirectoryName_YYYYMMDD(date);
             return output;
         }
 

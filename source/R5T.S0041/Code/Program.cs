@@ -104,10 +104,10 @@ namespace R5T.S0041
             //Construction.Instance.CompareDates();
             //Construction.Instance.SummarizeDatesComparison();
             //Construction.Instance.SummarizeNewAndOldInstances();
-            Construction.Instance.SendResultsEmail();
+            //Construction.Instance.SendResultsEmail();
 
             //Construction.Instance.OutputInstanceSpecificFiles();
-            //Construction.Instance.CopyFilesToCloudSharedDirectory();
+            Construction.Instance.CopyFilesToCloudSharedDirectory();
             //Construction.Instance.OpenOutputFiles();
 
             //await Task.Run(() => Instances.Operations.QueryProjectFiles_AndWriteToFile());
