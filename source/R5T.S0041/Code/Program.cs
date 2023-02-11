@@ -108,7 +108,7 @@ namespace R5T.S0041
 
             //Construction.Instance.OutputInstanceSpecificFiles();
             //Construction.Instance.CopyFilesToCloudSharedDirectory();
-            Construction.Instance.OpenOutputFiles();
+            //Construction.Instance.OpenOutputFiles();
 
             //await Task.Run(() => Instances.Operations.QueryProjectFiles_AndWriteToFile());
             //await Task.Run(() => Instances.Operations.QueryProjectFilesTuples_AndWriteToFile());
