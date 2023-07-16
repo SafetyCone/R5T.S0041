@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 
 using R5T.T0132;
+using R5T.T0159.Extensions;
 
 
 namespace R5T.S0041
@@ -444,7 +445,7 @@ namespace R5T.S0041
 
                     var projectFilePaths = Instances.FileSystemOperator.GetAllProjectFilePaths_FromRepositoriesDirectoryPaths(
                         repositoriesDirectoryPaths,
-                        logger)
+                        logger.ToTextOutput())
                         .OrderAlphabetically()
                         .Now();
 
@@ -479,7 +480,7 @@ namespace R5T.S0041
 
                     var projectFilePaths = F0082.FileSystemOperator.Instance.GetAllProjectFilePaths_FromRepositoriesDirectoryPaths(
                         repositoriesDirectoryPaths,
-                        logger)
+                        logger.ToTextOutput())
                         .OrderAlphabetically()
                         .Now();
 
@@ -689,7 +690,7 @@ namespace R5T.S0041
 
                     var projectFilePaths = F0082.FileSystemOperator.Instance.GetAllProjectFilePaths_FromRepositoriesDirectoryPaths(
                         repositoriesDirectoryPaths,
-                        logger)
+                        logger.ToTextOutput())
                         .OrderAlphabetically()
                         .Now();
 

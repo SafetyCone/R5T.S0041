@@ -803,8 +803,8 @@ namespace R5T.S0041
             string projectsListTextFilePath)
         {
             var lines = EnumerableHelper.From($"Projects, Count: {projectFilePaths.Count}\n\n")
-                .Append(projectFilePaths
-                    .OrderAlphabetically());
+                .Append(projectFilePaths.OrderAlphabetically2());
+                    //.OrderAlphabetically());
 
             FileHelper.WriteAllLines_Synchronous(
                     projectsListTextFilePath,
@@ -817,7 +817,7 @@ namespace R5T.S0041
             var output = repositoriesDirectoryPaths
                 .SelectMany(repositoriesDirectoryPath =>
                     Instances.Operations.GetAllProjectFilePaths(repositoriesDirectoryPath))
-                .OrderAlphabetically_OnlyIfDebug()
+                //.OrderAlphabetically_OnlyIfDebug()
                 .ToArray();
 
             return output;
