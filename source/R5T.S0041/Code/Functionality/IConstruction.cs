@@ -16,7 +16,7 @@ namespace R5T.S0041
         public void CompareDates()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
             var priorDate = Instances.Operations.GetPriorComparisonDate(date);
 
 
@@ -68,7 +68,7 @@ namespace R5T.S0041
             {
                 var fileName = Instances.FileNameOperator.GetTextOutputFileName_ForInstanceVariety(instanceVarietyName);
 
-                var cloudFilePath = Instances.PathOperator.GetFilePath(
+                var cloudFilePath = Instances.PathOperator.Get_FilePath(
                     DirectoryPaths.Instance.CloudOutputDirectoryPath,
                     fileName);
 
@@ -82,7 +82,7 @@ namespace R5T.S0041
         public void CopyFilesToCloudSharedDirectory()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -94,15 +94,15 @@ namespace R5T.S0041
             {
                 var fileName = Instances.FileNameOperator.GetTextOutputFileName_ForInstanceVariety(instanceVarietyName);
 
-                var sourceFilePath = Instances.PathOperator.GetFilePath(
+                var sourceFilePath = Instances.PathOperator.Get_FilePath(
                     datedOutputDirectoryPath,
                     fileName);
 
-                var destinationFilePath = Instances.PathOperator.GetFilePath(
+                var destinationFilePath = Instances.PathOperator.Get_FilePath(
                     DirectoryPaths.Instance.CloudOutputDirectoryPath,
                     fileName);
 
-                F0000.FileSystemOperator.Instance.CopyFile(
+                Instances.FileSystemOperator.Copy_File(
                     sourceFilePath,
                     destinationFilePath);
             }
@@ -111,7 +111,7 @@ namespace R5T.S0041
         public void OutputInstanceSpecificFiles()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -132,7 +132,7 @@ namespace R5T.S0041
             {
                 var fileName = Instances.FileNameOperator.GetTextOutputFileName_ForInstanceVariety(instanceVarietyName);
 
-                var outputFilePath = Instances.PathOperator.GetFilePath(
+                var outputFilePath = Instances.PathOperator.Get_FilePath(
                     datedOutputDirectoryPath,
                     fileName);
 
@@ -164,7 +164,7 @@ namespace R5T.S0041
         public void SummarizeProcessing()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -185,7 +185,7 @@ namespace R5T.S0041
 
             var instances = Instances.JsonOperator.Deserialize_Synchronous<N002.InstanceDescriptor[]>(instancesJsonFilePath);
 
-            var now = Instances.NowOperator.GetNow();
+            var now = Instances.NowOperator.Get_Now();
 
             var summaryLines = F0000.EnumerableOperator.Instance.From($"{F0000.DateOperator.Instance.ToString_YYYYMMDD_HHMMSS(now)}: As-of")
                 .Append(
@@ -194,7 +194,7 @@ namespace R5T.S0041
 
             var processingSummaryFilePath = Instances.FilePathProvider.Get_ProcessingSummaryTextFilePath(datedOutputDirectoryPath);
 
-            Instances.FileOperator.WriteLines_Synchronous(
+            Instances.FileOperator.Write_Lines_Synchronous(
                 processingSummaryFilePath,
                 summaryLines);
 
@@ -205,7 +205,7 @@ namespace R5T.S0041
         public void ProcessBuiltProjects()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -239,7 +239,7 @@ namespace R5T.S0041
                             projectCount,
                             tuple.ProjectFilePath);
 
-                        var assemblyFileExists = Instances.FileSystemOperator.FileExists(
+                        var assemblyFileExists = Instances.FileSystemOperator.Exists_File(
                                 tuple.AssemblyFilePath);
 
                         if (!assemblyFileExists)
@@ -276,7 +276,7 @@ namespace R5T.S0041
                         processingProblemsFilePath,
                         processingProblemTextsByProjectFilePath);
 
-                    Instances.FileOperator.WriteLines_Synchronous(
+                    Instances.FileOperator.Write_Lines_Synchronous(
                         processingProblemProjectsFilePath,
                         processingProblemTextsByProjectFilePath.Keys
                             .OrderAlphabetically());
@@ -295,7 +295,7 @@ namespace R5T.S0041
         public void CreateProjectFileTuples()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -343,7 +343,7 @@ namespace R5T.S0041
         public void BuildProjectFilePaths()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
             // True, if you want to spend the time to rebuild failed builds in order to collect build errors during this run.
             var rebuildFailedBuildsToCollectErrors = true;
 
@@ -410,7 +410,7 @@ namespace R5T.S0041
                         buildProblemTextsByProjectFilePath);
 
                     // Write build problem projects file.
-                    Instances.FileOperator.WriteLines(
+                    Instances.FileOperator.Write_Lines_Synchronous(
                         buildProblemProjectsFilePath,
                         buildProblemTextsByProjectFilePath.Keys
                             .OrderAlphabetically());
@@ -427,7 +427,7 @@ namespace R5T.S0041
         public void GetAllProjectFilePaths_OutputToDatedDirectory()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -441,7 +441,7 @@ namespace R5T.S0041
                 nameof(GetAllProjectFilePaths),
                 logger =>
                 {
-                    var repositoriesDirectoryPaths = Instances.RepositoriesDirectoryPaths.AllOfMine;
+                    var repositoriesDirectoryPaths = Instances.RepositoriesDirectoryPathsSets.All_Internal;
 
                     var projectFilePaths = Instances.FileSystemOperator.GetAllProjectFilePaths_FromRepositoriesDirectoryPaths(
                         repositoriesDirectoryPaths,
@@ -449,7 +449,7 @@ namespace R5T.S0041
                         .OrderAlphabetically()
                         .Now();
 
-                    Instances.FileOperator.WriteLines_Synchronous(
+                    Instances.FileOperator.Write_Lines_Synchronous(
                         projectsListTextFilePath,
                         projectFilePaths);
                 });
@@ -460,7 +460,7 @@ namespace R5T.S0041
         public void BuildAllProjectFilePaths_AndProcessAssemblies()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
             // True, if you want to spend the time to rebuild failed builds in order to collect build errors during this run.
             var rebuildFailedBuildsToCollectErrors = true;
 
@@ -476,7 +476,7 @@ namespace R5T.S0041
                 nameof(GetAllProjectFilePaths),
                 logger =>
                 {
-                    var repositoriesDirectoryPaths = Z0022.RepositoriesDirectoryPaths.Instance.AllOfMine;
+                    var repositoriesDirectoryPaths = Instances.RepositoriesDirectoryPathsSets.All_Internal;
 
                     var projectFilePaths = F0082.FileSystemOperator.Instance.GetAllProjectFilePaths_FromRepositoriesDirectoryPaths(
                         repositoriesDirectoryPaths,
@@ -485,11 +485,11 @@ namespace R5T.S0041
                         .Now();
 
                     // Output project paths to current run's directory.
-                    var projectsListTextFilePath = F0002.PathOperator.Instance.GetFilePath(
+                    var projectsListTextFilePath = F0002.PathOperator.Instance.Get_FilePath(
                         datedOutputDirectoryPath,
                         FileNames.Instance.ProjectsListTextFileName);
 
-                    F0000.FileOperator.Instance.WriteLines_Synchronous(
+                    F0000.FileOperator.Instance.Write_Lines_Synchronous(
                         projectsListTextFilePath,
                         F0000.EnumerableOperator.Instance.From($"{projectFilePaths.Length}: projects count")
                             .AppendRange(projectFilePaths));
@@ -560,7 +560,7 @@ namespace R5T.S0041
                     }
 
                     // Write problem projects file.
-                    var problemProjectsFilePath = Instances.PathOperator.GetFilePath(
+                    var problemProjectsFilePath = Instances.PathOperator.Get_FilePath(
                         datedOutputDirectoryPath,
                         FileNames.Instance.BuildProblemProjectsTextFileName);
 
@@ -569,7 +569,7 @@ namespace R5T.S0041
                         buildProblemTextsByProjectFilePath);
 
                     // Write project file tuples file.
-                    var projectFileTuplesJsonFilePath = Instances.PathOperator.GetFilePath(
+                    var projectFileTuplesJsonFilePath = Instances.PathOperator.Get_FilePath(
                         datedOutputDirectoryPath,
                         FileNames.Instance.ProjectFileTuplesJsonFileName);
 
@@ -592,7 +592,7 @@ namespace R5T.S0041
                                 projectCount,
                                 tuple.ProjectFilePath);
 
-                        if (!F0000.FileSystemOperator.Instance.FileExists(
+                        if (!Instances.FileSystemOperator.Exists_File(
                             tuple.AssemblyFilePath))
                         {
                             processingProblemProjects.Add(
@@ -626,7 +626,7 @@ namespace R5T.S0041
                     }
 
                     // Output files.
-                    var problemProcessingProjectsFilePath = F0002.PathOperator.Instance.GetFilePath(
+                    var problemProcessingProjectsFilePath = F0002.PathOperator.Instance.Get_FilePath(
                         datedOutputDirectoryPath,
                         FileNames.Instance.ProblemProcessingProjectsTextFileName);
 
@@ -634,16 +634,16 @@ namespace R5T.S0041
                         problemProcessingProjectsFilePath,
                         processingProblemProjects);
 
-                    var processedProjectFilePath = F0002.PathOperator.Instance.GetFilePath(
+                    var processedProjectFilePath = F0002.PathOperator.Instance.Get_FilePath(
                         datedOutputDirectoryPath,
                         FileNames.Instance.ProcessedProjectsTextFileName);
 
-                    F0000.FileOperator.Instance.WriteLines_Synchronous(
+                    F0000.FileOperator.Instance.Write_Lines_Synchronous(
                         processedProjectFilePath,
                         processedProjects);
 
                     // Output the instances.
-                    var instancesJsonFilePath = F0002.PathOperator.Instance.GetFilePath(
+                    var instancesJsonFilePath = F0002.PathOperator.Instance.Get_FilePath(
                         datedOutputDirectoryPath,
                         FileNames.Instance.InstancesJsonFileName);
 
@@ -652,7 +652,7 @@ namespace R5T.S0041
                        instances);
 
                     // Summarize.
-                    var now = Instances.NowOperator.GetNow();
+                    var now = Instances.NowOperator.Get_Now();
 
                     var summaryLines = F0000.EnumerableOperator.Instance.From($"{F0000.DateOperator.Instance.ToString_YYYYMMDD_HHMMSS(now)}: As-of")
                         .Append(
@@ -660,11 +660,11 @@ namespace R5T.S0041
                             $"{instances.Count}: total instances")
                         ;
 
-                    var summaryFilePath = F0002.PathOperator.Instance.GetFilePath(
+                    var summaryFilePath = F0002.PathOperator.Instance.Get_FilePath(
                         datedOutputDirectoryPath,
                         FileNames.Instance.SummaryTextFileName);
 
-                    F0000.FileOperator.Instance.WriteLines_Synchronous(
+                    F0000.FileOperator.Instance.Write_Lines_Synchronous(
                         summaryFilePath,
                         summaryLines);
 
@@ -686,7 +686,7 @@ namespace R5T.S0041
                 nameof(GetAllProjectFilePaths),
                 logger =>
                 {
-                    var repositoriesDirectoryPaths = Z0022.RepositoriesDirectoryPaths.Instance.AllOfMine;
+                    var repositoriesDirectoryPaths = Instances.RepositoriesDirectoryPathsSets.All_Internal;
 
                     var projectFilePaths = F0082.FileSystemOperator.Instance.GetAllProjectFilePaths_FromRepositoriesDirectoryPaths(
                         repositoriesDirectoryPaths,

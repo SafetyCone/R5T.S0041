@@ -26,7 +26,7 @@ namespace R5T.S0041
         {
             var datedDirectoryName = Instances.DirectoryNameOperator.GetDatedDirectoryName(date);
 
-            var datedOutputDirectoryPath = Instances.PathOperator.GetDirectoryPath(
+            var datedOutputDirectoryPath = Instances.PathOperator.Get_DirectoryPath(
                 parentDirectoryPath,
                 datedDirectoryName);
 
@@ -37,7 +37,7 @@ namespace R5T.S0041
         {
             var projectDirectoryPath = F0052.ProjectPathsOperator.Instance.GetProjectDirectoryPath(projectFilePath);
 
-            var publishDirectoryPath = F0002.PathOperator.Instance.GetDirectoryPath(
+            var publishDirectoryPath = F0002.PathOperator.Instance.Get_DirectoryPath(
                 projectDirectoryPath,
                 Instances.DirectoryNames.bin,
                 Instances.DirectoryNames.Publish);

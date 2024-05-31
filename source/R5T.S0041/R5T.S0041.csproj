@@ -32,7 +32,6 @@
     <ProjectReference Include="..\..\..\R5T.T0020\source\R5T.T0020\R5T.T0020.csproj" />
     <ProjectReference Include="..\..\..\R5T.D0105\source\R5T.D0105.I001\R5T.D0105.I001.csproj" />
     <ProjectReference Include="..\..\..\R5T.Z0006\source\R5T.Z0006\R5T.Z0006.csproj" />
-    <ProjectReference Include="..\..\..\R5T.Z0010\source\R5T.Z0010\R5T.Z0010.csproj" />
     <ProjectReference Include="..\..\..\R5T.Z0012\source\R5T.Z0012\R5T.Z0012.csproj" />
     <ProjectReference Include="..\..\..\R5T.Z0015\source\R5T.Z0015\R5T.Z0015.csproj" />
     <ProjectReference Include="..\..\..\R5T.Z0022.Private\source\R5T.Z0022\R5T.Z0022.csproj" />

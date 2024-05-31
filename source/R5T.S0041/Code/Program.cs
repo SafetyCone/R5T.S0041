@@ -155,11 +155,11 @@ namespace R5T.S0041
             /// Run.
             var allInstanceVarietyTextOutputFilePaths = Instances.FilePathOperator.GetAllTextOutputFilePaths();
 
-            var cloudOutputDestinationDirectoryFileCopyPairs = Instances.PathOperator.GetDestinationFileCopyPairs(
+            var cloudOutputDestinationDirectoryFileCopyPairs = Instances.PathOperator.Get_DestinationFileCopyPairs(
                 allInstanceVarietyTextOutputFilePaths,
                 Instances.DirectoryPaths.CloudOutputDirectoryPath);
 
-            Instances.FileSystemOperator.CopyFiles(cloudOutputDestinationDirectoryFileCopyPairs);
+            Instances.FileSystemOperator.Copy_Files(cloudOutputDestinationDirectoryFileCopyPairs);
 
             // Open files if desired.
             if (openFiles)
@@ -174,7 +174,7 @@ namespace R5T.S0041
 
         private Task OpenCloudOutputDirectory()
         {
-            F0034.WindowsExplorerOperator.Instance.OpenDirectoryInExplorer(
+            F0034.WindowsExplorerOperator.Instance.Open(
                 Instances.DirectoryPaths.CloudOutputDirectoryPath);
 
             return Task.CompletedTask;
@@ -182,7 +182,7 @@ namespace R5T.S0041
 
         private Task OpenOutputDirectory()
         {
-            F0034.WindowsExplorerOperator.Instance.OpenDirectoryInExplorer(
+            F0034.WindowsExplorerOperator.Instance.Open(
                 Instances.DirectoryPaths.OutputDirectoryPath);
 
             return Task.CompletedTask;
@@ -200,7 +200,7 @@ namespace R5T.S0041
         {
             var nugetAssembliesDirectoryPath = DirectoryPaths.Instance.NuGetAssemblies;
 
-            F0034.WindowsExplorerOperator.Instance.OpenDirectoryInExplorer(nugetAssembliesDirectoryPath);
+            F0034.WindowsExplorerOperator.Instance.Open(nugetAssembliesDirectoryPath);
 
             return Task.CompletedTask;
         }
@@ -231,7 +231,7 @@ namespace R5T.S0041
 
             /// Run.
             // Get summary data file path.
-            var summaryOutputDirectoryPath = Instances.PathOperator.GetDirectoryPath(
+            var summaryOutputDirectoryPath = Instances.PathOperator.Get_DirectoryPath(
                 processDirectoryPath,
                 "Summaries");
 
@@ -240,7 +240,7 @@ namespace R5T.S0041
 
             var datedSummaryOutputJsonFileName = $"Summary-{olderDateString} to {newerDateString}.json";
 
-            var datedSummaryOutputJsonFilePath = Instances.PathOperator.GetFilePath(
+            var datedSummaryOutputJsonFilePath = Instances.PathOperator.Get_FilePath(
                 summaryOutputDirectoryPath,
                 datedSummaryOutputJsonFileName);
 
@@ -326,7 +326,7 @@ namespace R5T.S0041
                         olderDate,
                         newerDate);
 
-                    var comparisonDatedNewFilePath = Instances.PathOperator.GetFilePath(
+                    var comparisonDatedNewFilePath = Instances.PathOperator.Get_FilePath(
                         newerDatedOutputDirectoryPath,
                         comparisonDatedNewFileName);
 
@@ -348,7 +348,7 @@ namespace R5T.S0041
                         olderDate,
                         newerDate);
 
-                    var comparisonDatedDepartedFilePath = Instances.PathOperator.GetFilePath(
+                    var comparisonDatedDepartedFilePath = Instances.PathOperator.Get_FilePath(
                         newerDatedOutputDirectoryPath,
                         comparisonDatedDepartedFileName);
 
@@ -387,7 +387,7 @@ namespace R5T.S0041
                 countChanges.Departed = departedCountInstances.Length;
             }
 
-            var summaryOutputDirectoryPath = Instances.PathOperator.GetDirectoryPath(
+            var summaryOutputDirectoryPath = Instances.PathOperator.Get_DirectoryPath(
                 outputDirectoryPath,
                 "Summaries");
 
@@ -396,12 +396,12 @@ namespace R5T.S0041
 
             var datedSummaryOutputJsonFileName = $"Summary-{olderDateString} to {newerDateString}.json";
 
-            var datedSummaryOutputJsonFilePath = Instances.PathOperator.GetFilePath(
+            var datedSummaryOutputJsonFilePath = Instances.PathOperator.Get_FilePath(
                 summaryOutputDirectoryPath,
                 datedSummaryOutputJsonFileName);
 
             // Write summary.
-            Instances.FileSystemOperator.CreateDirectory_OkIfAlreadyExists(summaryOutputDirectoryPath);
+            Instances.FileSystemOperator.Create_Directory_OkIfAlreadyExists(summaryOutputDirectoryPath);
 
             JsonFileHelper.WriteToFile(
                 datedSummaryOutputJsonFilePath,
@@ -471,7 +471,7 @@ namespace R5T.S0041
                         olderDate,
                         newerDate);
 
-                    var comparisonDatedNewFilePath = Instances.PathOperator.GetFilePath(
+                    var comparisonDatedNewFilePath = Instances.PathOperator.Get_FilePath(
                         newerDatedOutputDirectoryPath,
                         comparisonDatedNewFileName);
 
@@ -493,7 +493,7 @@ namespace R5T.S0041
                         olderDate,
                         newerDate);
 
-                    var comparisonDatedDepartedFilePath = Instances.PathOperator.GetFilePath(
+                    var comparisonDatedDepartedFilePath = Instances.PathOperator.Get_FilePath(
                         newerDatedOutputDirectoryPath,
                         comparisonDatedDepartedFileName);
 
@@ -597,7 +597,7 @@ namespace R5T.S0041
 
             foreach (var (sourceFilePath, destinationFilePath) in fileCopyPairs)
             {
-                Instances.FileSystemOperator.CopyFile(
+                Instances.FileSystemOperator.Copy_File(
                     sourceFilePath: sourceFilePath,
                     destinationFilePath: destinationFilePath);
             }
@@ -733,7 +733,7 @@ namespace R5T.S0041
             // Setup per-variety operations.
             var instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName = new Dictionary<string, string>
             {
-                { Instances.InstanceVariety.MarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.MarkerAttributeMarkerAttribute>() },
+                { Instances.InstanceVariety.MarkerAttribute, F0000.Instances.TypeOperator.Get_NamespacedTypeName<T0143.MarkerAttributeMarkerAttribute>() },
             };
 
             var getInstanceIdentityNamesByInstanceVariety = instanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName
@@ -836,7 +836,7 @@ namespace R5T.S0041
             /// Run.
             var cacheFilePath = jsonOutputFilePath;
 
-            var canUseCache = useCache && Instances.FileSystemOperator.FileExists(cacheFilePath);
+            var canUseCache = useCache && Instances.FileSystemOperator.Exists_File(cacheFilePath);
 
             InstanceDescriptor[] LoadCache()
             {
@@ -970,7 +970,7 @@ namespace R5T.S0041
             /// Run.
             var cacheFilePath = @"C:\Temp\Functionality-Draft-Cached.json";
 
-            var useCache = requestUseCache && Instances.FileSystemOperator.FileExists(cacheFilePath);
+            var useCache = requestUseCache && Instances.FileSystemOperator.Exists_File(cacheFilePath);
 
             InstanceDescriptor[] LoadCache()
             {
@@ -1103,7 +1103,7 @@ namespace R5T.S0041
             /// Run.
             var cacheFilePath = @"C:\Temp\Functionality-Draft List-Cached.json";
 
-            var useCache = requestUseCache && Instances.FileSystemOperator.FileExists(cacheFilePath);
+            var useCache = requestUseCache && Instances.FileSystemOperator.Exists_File(cacheFilePath);
 
             Dictionary<string, string[]> LoadCache()
             {
@@ -1222,7 +1222,7 @@ namespace R5T.S0041
             /// Run.
             var cacheFilePath = @"C:\Temp\Functionality-Draft Interfaces List-Cached.json";
 
-            var useCache = requestUseCache && Instances.FileSystemOperator.FileExists(cacheFilePath);
+            var useCache = requestUseCache && Instances.FileSystemOperator.Exists_File(cacheFilePath);
 
             Dictionary<string, string[]> LoadCache()
             {
@@ -1248,13 +1248,13 @@ namespace R5T.S0041
                     {
                         this.Logger.LogInformation($"Processing {counter} of {projectCount}:\n{tuple.ProjectFilePath}");
 
-                        var projectFileExists = Instances.FileSystemOperator.FileExists(tuple.ProjectFilePath);
+                        var projectFileExists = Instances.FileSystemOperator.Exists_File(tuple.ProjectFilePath);
                         if (!projectFileExists)
                         {
                             throw new Exception("Project file did not exist.");
                         }
 
-                        var assemblyFileExists = Instances.FileSystemOperator.FileExists(tuple.AssemblyFilePath);
+                        var assemblyFileExists = Instances.FileSystemOperator.Exists_File(tuple.AssemblyFilePath);
                         if (!assemblyFileExists)
                         {
                             //throw new FileNotFoundException("Assembly file did not exist.", tuple.AssemblyFilePath);

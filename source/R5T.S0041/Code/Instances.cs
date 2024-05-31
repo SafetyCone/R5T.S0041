@@ -23,7 +23,7 @@ namespace R5T.S0041
         public static F0097.IEmailSender EmailSender => F0097.EmailSender.Instance;
         public static F0000.IEnumerableOperator EnumerableOperator => F0000.EnumerableOperator.Instance;
         public static F0002.IExecutablePathOperator ExecutablePathOperator => F0002.ExecutablePathOperator.Instance;
-        public static S0041.IFileExtensions FileExtensions => S0041.FileExtensions.Instance;
+        public static Z0072.Z002.IFileExtensions FileExtensions => Z0072.Z002.FileExtensions.Instance;
         public static IFileNameOperator FileNameOperator => S0041.FileNameOperator.Instance;
         public static IFileNames FileNames => S0041.FileNames.Instance;
         public static F0000.IFileOperator FileOperator => F0000.FileOperator.Instance;
@@ -37,6 +37,7 @@ namespace R5T.S0041
         public static IInstanceVarietyOperator InstanceVarietyOperator => S0041.InstanceVarietyOperator.Instance;
         public static F0032.IJsonOperator JsonOperator => F0032.JsonOperator.Instance;
         public static F0035.ILoggingOperator LoggingOperator => F0035.LoggingOperator.Instance;
+        public static F0000.INamespacedTypeNameOperator NamespacedTypeNameOperator => F0000.NamespacedTypeNameOperator.Instance;
         public static INamespacedTypeNames NamespacedTypeNames => Z0006.NamespacedTypeNames.Instance;
         public static F0033.INotepadPlusPlusOperator NotepadPlusPlusOperator => F0033.NotepadPlusPlusOperator.Instance;
         public static F0000.INowOperator NowOperator => F0000.NowOperator.Instance;
@@ -45,10 +46,11 @@ namespace R5T.S0041
         public static F0052.IProjectPathsOperator ProjectPathsOperator => F0052.ProjectPathsOperator.Instance;
         public static Functionalities.IOperations Operations => Functionalities.Operations.Instance;
         public static IReflectionOperator ReflectionOperator => F0018.ReflectionOperator.Instance;
-        public static Z0022.IRepositoriesDirectoryPaths RepositoriesDirectoryPaths => Z0022.RepositoriesDirectoryPaths.Instance;
+        public static Z0022.IRepositoriesDirectoryPathsSets RepositoriesDirectoryPathsSets => Z0022.RepositoriesDirectoryPathsSets.Instance;
         public static IServiceAction ServiceAction => T0062.ServiceAction.Instance;
         public static F0000.IStringOperator StringOperator => F0000.StringOperator.Instance;
         public static Z0000.IStrings Strings => Z0000.Strings.Instance;
         public static ITypeOperator TypeOperator => S0041.TypeOperator.Instance;
+        public static L0089.F000.IWasFoundOperator WasFoundOperator => L0089.F000.WasFoundOperator.Instance;
     }
 }

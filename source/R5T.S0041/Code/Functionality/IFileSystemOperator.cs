@@ -1,7 +1,7 @@
 using System;
 
-using R5T.F0000;
 using R5T.T0132;
+using R5T.L0089.T000;
 
 
 namespace R5T.S0041
@@ -9,6 +9,7 @@ namespace R5T.S0041
     [FunctionalityMarker]
     public partial interface IFileSystemOperator : IFunctionalityMarker,
         F0000.IFileSystemOperator,
+        F0002.IFileSystemOperator,
         F0082.IFileSystemOperator
     {
         public bool Has_OutputAssembly(
@@ -16,7 +17,7 @@ namespace R5T.S0041
         {
             var assemblyFilePath = Instances.FilePathProvider.Get_PublishDirectoryOutputAssemblyFilePath(projectFilePath);
 
-            var outputAssemblyExists = Instances.FileSystemOperator.FileExists(assemblyFilePath);
+            var outputAssemblyExists = Instances.FileSystemOperator.Exists_File(assemblyFilePath);
             return outputAssemblyExists;
         }
 
@@ -25,7 +26,7 @@ namespace R5T.S0041
         {
             var buildJsonFilePath = Instances.FilePathProvider.Get_BuildJsonFilePath(projectFilePath);
 
-            var buildJsonFileExists = Instances.FileSystemOperator.FileExists(buildJsonFilePath);
+            var buildJsonFileExists = Instances.FileSystemOperator.Exists_File(buildJsonFilePath);
             return buildJsonFileExists;
         }
 
@@ -34,7 +35,7 @@ namespace R5T.S0041
         {
             var buildJsonFilePath = Instances.FilePathProvider.Get_BuildJsonFilePath(projectFilePath);
 
-            var buildJsonFileExists = Instances.FileSystemOperator.FileExists(buildJsonFilePath);
+            var buildJsonFileExists = Instances.FileSystemOperator.Exists_File(buildJsonFilePath);
 
             var buildResultOrDefault = buildJsonFileExists
                 ? Instances.JsonOperator.Deserialize_Synchronous<BuildResult>(buildJsonFilePath)

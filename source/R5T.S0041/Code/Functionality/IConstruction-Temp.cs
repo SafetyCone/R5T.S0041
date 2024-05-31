@@ -15,7 +15,7 @@ namespace R5T.S0041
         public void SendResultsEmail()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -66,7 +66,7 @@ namespace R5T.S0041
         public void SummarizeNewAndOldInstances()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -136,7 +136,7 @@ namespace R5T.S0041
         public void SummarizeDatesComparison()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
             var priorDate = Instances.Operations.GetPriorComparisonDate(date);
 
 

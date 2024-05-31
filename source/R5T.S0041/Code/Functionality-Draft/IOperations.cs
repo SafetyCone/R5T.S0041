@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using R5T.Magyar.Extensions;
 
 using R5T.F0000;
+using R5T.L0089.T000;
 using R5T.T0132;
 
 
@@ -50,7 +51,7 @@ namespace R5T.S0041
 
             // Output an S0041-specific file (R5T.S0041.Build.json) containing build time to publish directory.
             // Output this regardless of build success so that projects are not rebuilt in either case until project files change.
-            var buildTime = Instances.NowOperator.GetNow_Local();
+            var buildTime = Instances.NowOperator.Get_Now_Local();
 
             var buildResult = new BuildResult
             {
@@ -195,7 +196,7 @@ namespace R5T.S0041
 
             var buildJsonFilePath = Instances.FilePathProvider.Get_BuildJsonFilePath_FromPublishDirectory(publishDirectoryPath);
 
-            var buildJsonFileExists = Instances.FileSystemOperator.FileExists(buildJsonFilePath);
+            var buildJsonFileExists = Instances.FileSystemOperator.Exists_File(buildJsonFilePath);
             if(buildJsonFileExists)
             {
                 var buildResult = Instances.JsonOperator.Deserialize_Synchronous<BuildResult>(
@@ -255,7 +256,7 @@ namespace R5T.S0041
             var directoryDates = directoryPaths
                 .Select(directoryPath =>
                 {
-                    var directoryName = Instances.PathOperator.GetDirectoryNameOfDirectoryPath(directoryPath);
+                    var directoryName = Instances.PathOperator.Get_DirectoryName_OfDirectoryPath(directoryPath);
 
                     var isYYYYMMDD = Instances.DateOperator.IsYYYYMMDD(directoryName);
                     return isYYYYMMDD;
@@ -411,7 +412,7 @@ namespace R5T.S0041
             bool useProjectFilesTuplesCache,
             string projectFilesTuplesJsonFilePath)
         {
-            var canUseProjectFilesTuplesCache = useProjectFilesTuplesCache && Instances.FileSystemOperator.FileExists(projectFilesTuplesJsonFilePath);
+            var canUseProjectFilesTuplesCache = useProjectFilesTuplesCache && Instances.FileSystemOperator.Exists_File(projectFilesTuplesJsonFilePath);
 
             var output = canUseProjectFilesTuplesCache
                 ? this.LoadProjectFilesTuples(projectFilesTuplesJsonFilePath)
@@ -461,7 +462,7 @@ namespace R5T.S0041
             string targetFilePath,
             string searchDirectoryPath)
         {
-            var fileNameStem = Instances.PathOperator.GetFileNameStem(targetFilePath);
+            var fileNameStem = Instances.PathOperator.Get_FileNameStem(targetFilePath);
 
             // Begins with the file name stem, followed by a dash, then eight (8) numeric digits.
             var regexPattern = $@"^{fileNameStem}-\d{{8}}";;
@@ -549,13 +550,13 @@ namespace R5T.S0041
                 logger,
                 tuple =>
                 {
-                    var projectFileExists = Instances.FileSystemOperator.FileExists(tuple.ProjectFilePath);
+                    var projectFileExists = Instances.FileSystemOperator.Exists_File(tuple.ProjectFilePath);
                     if (!projectFileExists)
                     {
                         throw new Exception("Project file did not exist.");
                     }
 
-                    var assemblyFileExists = Instances.FileSystemOperator.FileExists(tuple.AssemblyFilePath);
+                    var assemblyFileExists = Instances.FileSystemOperator.Exists_File(tuple.AssemblyFilePath);
                     if (!assemblyFileExists)
                     {
                         //throw new FileNotFoundException($"Assembly file did not exist: {tuple.AssemblyFilePath}", tuple.AssemblyFilePath);
@@ -628,17 +629,17 @@ namespace R5T.S0041
             var firstDateString = Instances.DateOperator.ToString_YYYYMMDD(firstDate);
             var secondDateString = Instances.DateOperator.ToString_YYYYMMDD(secondDate);
 
-            var fileName = Instances.PathOperator.GetFileName(filePath);
+            var fileName = Instances.PathOperator.Get_FileName(filePath);
 
-            var fileNameStem = Instances.FileNameOperator.GetFileNameStem(fileName);
-            var fileExtension = Instances.FileNameOperator.GetFileExtension(fileName);
+            var fileNameStem = Instances.FileNameOperator.Get_FileNameStem(fileName);
+            var fileExtension = Instances.FileNameOperator.Get_FileExtension(fileName);
 
             var datedFileNameStem = $"{fileNameStem}-{firstDateString} to {secondDateString}";
-            var datedFileName = Instances.FileNameOperator.GetFileName(
+            var datedFileName = Instances.FileNameOperator.Get_FileName(
                 datedFileNameStem,
                 fileExtension);
 
-            var datedFilePath = Instances.PathOperator.GetFilePath(
+            var datedFilePath = Instances.PathOperator.Get_FilePath(
                 outputDirectoryPath,
                 datedFileName);
 
@@ -652,17 +653,17 @@ namespace R5T.S0041
         {
             var dateString = Instances.DateOperator.ToString_YYYYMMDD(date);
 
-            var fileName = Instances.PathOperator.GetFileName(filePath);
+            var fileName = Instances.PathOperator.Get_FileName(filePath);
 
-            var fileNameStem = Instances.FileNameOperator.GetFileNameStem(fileName);
-            var fileExtension = Instances.FileNameOperator.GetFileExtension(fileName);
+            var fileNameStem = Instances.FileNameOperator.Get_FileNameStem(fileName);
+            var fileExtension = Instances.FileNameOperator.Get_FileExtension(fileName);
 
             var datedFileNameStem = $"{fileNameStem}-{dateString}";
-            var datedFileName = Instances.FileNameOperator.GetFileName(
+            var datedFileName = Instances.FileNameOperator.Get_FileName(
                 datedFileNameStem,
                 fileExtension);
 
-            var datedFilePath = Instances.PathOperator.GetFilePath(
+            var datedFilePath = Instances.PathOperator.Get_FilePath(
                 outputDirectoryPath,
                 datedFileName);
 
@@ -746,7 +747,7 @@ namespace R5T.S0041
         public InstanceDescriptor[] LoadFunctionalityDescriptors(
             string instanceDescriptorJsonFilePath)
         {
-            var fileExists = Instances.FileSystemOperator.FileExists(instanceDescriptorJsonFilePath);
+            var fileExists = Instances.FileSystemOperator.Exists_File(instanceDescriptorJsonFilePath);
             if (!fileExists)
             {
                 return Array.Empty<InstanceDescriptor>();
@@ -945,7 +946,7 @@ namespace R5T.S0041
                 documentationXmlFilePath,
                 memberIdentityName);
 
-            var output = WasFoundOperator.Instance.ResultOrExceptionIfNotFound(
+            var output = Instances.WasFoundOperator.Get_Result_OrExceptionIfNotFound(
                 wasFound,
                 $"{memberIdentityName}: No documentation for member.");
 
@@ -1181,13 +1182,13 @@ namespace R5T.S0041
             ProjectFilesTuple tuple,
             Func<ProjectFilesTuple, TOut> projectFilesTupleFunction)
         {
-            var projectFileExists = Instances.FileSystemOperator.FileExists(tuple.ProjectFilePath);
+            var projectFileExists = Instances.FileSystemOperator.Exists_File(tuple.ProjectFilePath);
             if (!projectFileExists)
             {
                 throw new Exception("Project file did not exist.");
             }
 
-            var assemblyFileExists = Instances.FileSystemOperator.FileExists(tuple.AssemblyFilePath);
+            var assemblyFileExists = Instances.FileSystemOperator.Exists_File(tuple.AssemblyFilePath);
             if (!assemblyFileExists)
             {
                 throw new Exception("Assembly file did not exist.");
@@ -1347,7 +1348,7 @@ namespace R5T.S0041
                         .Select(this.GetMethodInstanceIdentityNames)
                         .ToArray();
 
-                    var output = WasFound.FromArray(functionaityMethodNames);
+                    var output = WasFound.From_Array(functionaityMethodNames);
                     return output;
                 });
 
@@ -1385,7 +1386,7 @@ namespace R5T.S0041
                         })
                         .ToArray();
 
-                    var output = WasFound.FromArray(draftFunctionaityMethodNames);
+                    var output = WasFound.From_Array(draftFunctionaityMethodNames);
                     return output;
                 });
 
@@ -1413,7 +1414,7 @@ namespace R5T.S0041
                         .Select(xMethodInfo => Instances.IdentityNameProvider.GetIdentityName(xMethodInfo))
                         .ToArray();
 
-                    var output = WasFound.FromArray(draftFunctionaityMethodNames);
+                    var output = WasFound.From_Array(draftFunctionaityMethodNames);
                     return output;
                 });
 
@@ -1443,7 +1444,7 @@ namespace R5T.S0041
                 .Where(this.IsInstanceMethod)
                 .ToArray();
 
-            var output = WasFound.FromArray(draftFunctionalityMethods);
+            var output = WasFound.From_Array(draftFunctionalityMethods);
             return output;
         }
 
@@ -1462,7 +1463,7 @@ namespace R5T.S0041
                 })
                 .ToArray();
 
-            var output = WasFound.FromArray(draftFunctionalityMethods);
+            var output = WasFound.From_Array(draftFunctionalityMethods);
             return output;
         }
 
@@ -1476,7 +1477,7 @@ namespace R5T.S0041
                 assembly,
                 this.GetDraftFunctionalityPredicate());
 
-            var output = WasFound.FromArray(draftFunctionalityTypes);
+            var output = WasFound.From_Array(draftFunctionalityTypes);
             return output;
         }
 
@@ -1490,7 +1491,7 @@ namespace R5T.S0041
                 assembly,
                 this.GetFunctionalityPredicate());
 
-            var output = WasFound.FromArray(functionalityTypes);
+            var output = WasFound.From_Array(functionalityTypes);
             return output;
         }
 
@@ -1512,7 +1513,7 @@ namespace R5T.S0041
                         .Select(xType => xType.FullName)
                         .Now();
 
-                    var output = WasFound.FromArray(draftFunctionalityTypeNames);
+                    var output = WasFound.From_Array(draftFunctionalityTypeNames);
                     return output;
                 });
 

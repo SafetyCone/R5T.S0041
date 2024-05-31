@@ -31,7 +31,7 @@ namespace R5T.S0041
 
 			var appendix = $"-{earlierYyyymmdd} to {laterYyyymmdd}";
 
-			var output = Instances.FileNameOperator.AppendToFileNameStem(
+			var output = Instances.FileNameOperator.Append_ToFileNameStem(
 				fileName,
 				appendix);
 
@@ -46,7 +46,7 @@ namespace R5T.S0041
 
 			var appendix = $"-{yyyymmdd}";
 
-			var output = Instances.FileNameOperator.AppendToFileNameStem(
+			var output = Instances.FileNameOperator.Append_ToFileNameStem(
 				fileName,
 				appendix);
 
@@ -55,7 +55,7 @@ namespace R5T.S0041
 
 		public string GetDepartedFileName_FromFileName(string fileName)
 		{
-			var departedFileName = Instances.FileNameOperator.AppendToFileNameStem(
+			var departedFileName = Instances.FileNameOperator.Append_ToFileNameStem(
 				fileName,
 				"-Departed");
 
@@ -66,7 +66,7 @@ namespace R5T.S0041
 		{
 			var fileNameStem = this.GetOutputFileNameStem_ForInstanceVariety(instanceVarietyName);
 
-			var output = this.GetFileName(
+			var output = this.Get_FileName(
 				fileNameStem,
 				Instances.FileExtensions.Json);
 
@@ -75,7 +75,7 @@ namespace R5T.S0041
 
 		public string GetNewFileName_FromFileName(string fileName)
 		{
-			var departedFileName = Instances.FileNameOperator.AppendToFileNameStem(
+			var departedFileName = Instances.FileNameOperator.Append_ToFileNameStem(
 				fileName,
 				"-New");
 
@@ -93,7 +93,7 @@ namespace R5T.S0041
 		{
 			var fileNameStem = this.GetOutputFileNameStem_ForInstanceVariety(instanceVarietyName);
 
-			var output = this.GetFileName(
+			var output = this.Get_FileName(
 				fileNameStem,
 				Instances.FileExtensions.Text);
 

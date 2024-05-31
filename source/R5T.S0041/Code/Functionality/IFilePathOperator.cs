@@ -19,7 +19,7 @@ namespace R5T.S0041
 				;
 
 			var cloudOutputTextFilePaths = textOutputFilePaths
-				.Select(textOutputFilePath => Instances.PathOperator.GetDestinationFilePath(
+				.Select(textOutputFilePath => Instances.PathOperator.Get_DestinationFilePath(
 					textOutputFilePath,
 					Instances.DirectoryPaths.CloudOutputDirectoryPath))
 				.ToArray();
@@ -31,7 +31,7 @@ namespace R5T.S0041
         {
 			var allTextOutputFilePaths = this.GetAllTextOutputFilePaths();
 
-			var allCloudTextOutputFilePaths = Instances.PathOperator.GetDestinationFilePaths(
+			var allCloudTextOutputFilePaths = Instances.PathOperator.Get_DestinationFilePaths(
 				allTextOutputFilePaths,
 				Instances.DirectoryPaths.CloudOutputDirectoryPath)
 				.ToArray();
@@ -77,7 +77,7 @@ namespace R5T.S0041
 						earlierDate,
 						laterDate);
 
-					var datedComparisonJsonOutputFilePath = Instances.PathOperator.GetFilePath(
+					var datedComparisonJsonOutputFilePath = Instances.PathOperator.Get_FilePath(
 						outputDirectoryPath,
 						datedComparisonFileName);
 
@@ -101,7 +101,7 @@ namespace R5T.S0041
 						fileName,
 						date);
 
-					var datedJsonOutputFilePath = Instances.PathOperator.GetFilePath(
+					var datedJsonOutputFilePath = Instances.PathOperator.Get_FilePath(
 						outputDirectoryPath,
 						datedFileName);
 
@@ -120,7 +120,7 @@ namespace R5T.S0041
 				{
 					var fileName = Instances.FileNameOperator.GetJsonOutputFileName_ForInstanceVariety(instanceVarietyName);
 
-					var jsonOutputFilePath = Instances.PathOperator.GetFilePath(
+					var jsonOutputFilePath = Instances.PathOperator.Get_FilePath(
 						outputDirectoryPath,
 						fileName);
 
@@ -134,7 +134,7 @@ namespace R5T.S0041
         {
 			var fileName = Instances.FileNameOperator.GetJsonOutputFileName_ForInstanceVariety(instanceVarietyName);
 
-			var output = Instances.PathOperator.GetFilePath(
+			var output = Instances.PathOperator.Get_FilePath(
 				Instances.DirectoryPaths.InitialOutputDirectorPath,
 				fileName);
 
@@ -145,7 +145,7 @@ namespace R5T.S0041
         {
 			var fileName = Instances.FileNameOperator.GetTextOutputFileName_ForInstanceVariety(instanceVarietyName);
 
-			var output = Instances.PathOperator.GetFilePath(
+			var output = Instances.PathOperator.Get_FilePath(
 				Instances.DirectoryPaths.InitialOutputDirectorPath,
 				fileName);
 

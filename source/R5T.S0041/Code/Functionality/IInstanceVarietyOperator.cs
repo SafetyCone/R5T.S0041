@@ -88,7 +88,7 @@ namespace R5T.S0041
 		public string GetInstanceVarietyName(string markerAttributeNamespacedTypeName)
         {
 			// Use the type name of the marker attribute.
-			var instanceVarietyName = F0000.Instances.NamespacedTypeNameOperator.GetTypeName(markerAttributeNamespacedTypeName);
+			var instanceVarietyName = Instances.NamespacedTypeNameOperator.Get_TypeName(markerAttributeNamespacedTypeName);
 			return instanceVarietyName;
         }
 	}

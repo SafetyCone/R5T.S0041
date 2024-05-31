@@ -11,7 +11,7 @@ namespace R5T.S0041
         public string Get_NewAndOldSummaryTextFilePath(
             string datedOutputDirectoryPath)
         {
-            var instancesJsonFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var instancesJsonFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.NewAndOldSummaryTextFilePath);
 
@@ -21,7 +21,7 @@ namespace R5T.S0041
         public string Get_DateComparisonSummaryTextFilePath(
             string datedOutputDirectoryPath)
         {
-            var instancesJsonFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var instancesJsonFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.DateComparisonSummaryTextFilePath);
 
@@ -31,7 +31,7 @@ namespace R5T.S0041
         public string Get_NewInstancesJsonFilePath(
             string datedOutputDirectoryPath)
         {
-            var instancesJsonFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var instancesJsonFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.NewInstancesJsonFileName);
 
@@ -41,7 +41,7 @@ namespace R5T.S0041
         public string Get_OldInstancesJsonFilePath(
             string datedOutputDirectoryPath)
         {
-            var instancesJsonFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var instancesJsonFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.OldInstancesJsonFileName);
 
@@ -51,7 +51,7 @@ namespace R5T.S0041
         public string Get_ProcessingSummaryTextFilePath(
             string datedOutputDirectoryPath)
         {
-            var summaryFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var summaryFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.ProcessingSummaryTextFileName);
 
@@ -61,7 +61,7 @@ namespace R5T.S0041
         public string Get_InstancesJsonFilePath(
             string datedOutputDirectoryPath)
         {
-            var instancesJsonFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var instancesJsonFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.InstancesJsonFileName);
 
@@ -71,7 +71,7 @@ namespace R5T.S0041
         public string Get_ProcessingProblemProjectsTextFilePath(
             string datedOutputDirectoryPath)
         {
-            var buildProblemProjectsFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var buildProblemProjectsFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.ProcessingProblemProjectsTextFileName);
 
@@ -81,7 +81,7 @@ namespace R5T.S0041
         public string Get_ProcessingProblemsTextFilePath(
             string datedOutputDirectoryPath)
         {
-            var buildProblemsFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var buildProblemsFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.ProcessingProblemsTextFileName);
 
@@ -91,7 +91,7 @@ namespace R5T.S0041
         public string Get_ProjectFileTuplesJsonFilePath(
             string datedOutputDirectoryPath)
         {
-            var projectFileTuplesJsonFilePath = Instances.PathOperator.GetFilePath(
+            var projectFileTuplesJsonFilePath = Instances.PathOperator.Get_FilePath(
                 datedOutputDirectoryPath,
                 Instances.FileNames.ProjectFileTuplesJsonFileName);
 
@@ -101,7 +101,7 @@ namespace R5T.S0041
         public string Get_BuildProblemProjectsTextFilePath(
             string datedOutputDirectoryPath)
         {
-            var buildProblemProjectsFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var buildProblemProjectsFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.BuildProblemProjectsTextFileName);
 
@@ -111,7 +111,7 @@ namespace R5T.S0041
         public string Get_BuildProblemsTextFilePath(
             string datedOutputDirectoryPath)
         {
-            var buildProblemsFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var buildProblemsFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 datedOutputDirectoryPath,
                 FileNames.Instance.BuildProblemsTextFileName);
 
@@ -128,7 +128,7 @@ namespace R5T.S0041
 
         public string Get_BuildJsonFilePath_FromPublishDirectory(string publishDirectoryPath)
         {
-            var buildJsonFilePath = F0002.PathOperator.Instance.GetFilePath(
+            var buildJsonFilePath = F0002.PathOperator.Instance.Get_FilePath(
                 publishDirectoryPath,
                 FileNames.Instance.BuildJsonFileName);
 
@@ -139,11 +139,11 @@ namespace R5T.S0041
         {
             var exampleAssemblyFileNameStem = Instances.AssemblyNames.R5T_Z0025;
 
-            var exampleAssemblyFileName = Instances.FileNameOperator.GetFileName(
+            var exampleAssemblyFileName = Instances.FileNameOperator.Get_FileName(
                 exampleAssemblyFileNameStem,
                 Instances.FileExtensions.Dll);
 
-            var exampleAssemblyFilePath = Instances.ExecutablePathOperator.GetExecutableDirectoryRelativeFilePath(
+            var exampleAssemblyFilePath = Instances.ExecutablePathOperator.Get_Path_ExecutableDirectoryRelative(
                 exampleAssemblyFileName);
 
             return exampleAssemblyFilePath;
@@ -156,11 +156,11 @@ namespace R5T.S0041
 
             var projectName = Instances.ProjectPathsOperator.GetProjectName(projectFilePath);
 
-            var outputAssemblyFileName = F0000.FileNameOperator.Instance.GetFileName(
+            var outputAssemblyFileName = F0000.FileNameOperator.Instance.Get_FileName(
                 projectName,
                 Instances.FileExtensions.Dll);
 
-            var assemblyFilePath = Instances.PathOperator.GetFilePath(
+            var assemblyFilePath = Instances.PathOperator.Get_FilePath(
                 publishDirectoryPath,
                 outputAssemblyFileName);
 
@@ -170,7 +170,7 @@ namespace R5T.S0041
         public string Get_ProjectsListTextFilePath(
             string datedOutputDirectoryPath)
         {
-            var projectsListTextFilePath = Instances.PathOperator.GetFilePath(
+            var projectsListTextFilePath = Instances.PathOperator.Get_FilePath(
                 datedOutputDirectoryPath,
                 Instances.FileNames.ProjectsListTextFileName);
 
